@@ -68,18 +68,18 @@ pub enum DecodeError {
 
 impl fmt::Display for DecodeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
+        match *self {
             Self::InvalidCharacter => write!(f, "Invalid base62 character"),
             Self::Overflow => write!(f, "Decoded value would overflow u64"),
-            Self::Other(e) => write!(f, "Base62 decode error: {}", e),
+            Self::Other(ref e) => write!(f, "Base62 decode error: {}", e),
         }
     }
 }
 
 impl Error for DecodeError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            Self::Other(e) => Some(e),
+        match *self {
+            Self::Other(ref e) => Some(e),
             _ => None,
         }
     }

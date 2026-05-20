@@ -55,6 +55,7 @@ impl SnowID {
         Ok(Self::build(node_id, config))
     }
 
+    #[allow(clippy::missing_const_for_fn)] // Result return is not const-stable
     fn validate_node_id(node_id: u16, config: &SnowIDConfig) -> Result<(), SnowIDError> {
         let max = config.max_node_id();
         if node_id > max {
@@ -63,7 +64,7 @@ impl SnowID {
         Ok(())
     }
 
-    fn build(node_id: u16, config: SnowIDConfig) -> Self {
+    const fn build(node_id: u16, config: SnowIDConfig) -> Self {
         Self {
             state: AtomicU64::new(0),
             node_prefix: Self::compute_node_prefix(node_id, &config),
@@ -78,7 +79,8 @@ impl SnowID {
     }
 
     #[inline(always)]
-    fn compute_node_prefix(node_id: u16, config: &SnowIDConfig) -> u64 {
+    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
+    const fn compute_node_prefix(node_id: u16, config: &SnowIDConfig) -> u64 {
         (node_id as u64) << config.node_shift()
     }
 
@@ -101,14 +103,16 @@ impl SnowID {
     }
 
     #[inline(always)]
-    pub(crate) fn assemble_id(&self, timestamp: u64, sequence: u16) -> u64 {
+    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
+    pub(crate) const fn assemble_id(&self, timestamp: u64, sequence: u16) -> u64 {
         ((timestamp & self.ts_mask) << self.ts_shift) | self.node_prefix | (sequence as u64)
     }
 
     #[inline(always)]
     #[allow(dead_code)] // Used in extractor.rs tests
     #[allow(clippy::too_many_arguments)]
-    pub(crate) fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
+    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
+    pub(crate) const fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
         ((ts & self.config.timestamp_mask()) << self.config.timestamp_shift())
             | ((node as u64) << self.config.node_shift())
             | (seq as u64)
