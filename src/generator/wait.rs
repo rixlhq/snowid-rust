@@ -88,10 +88,7 @@ mod tests {
 
     #[test]
     fn test_spin_wait_immediate_advance() {
-        let config = SnowIDConfig::builder()
-            .enable_spin(true)
-            .spin_loops(10)
-            .build();
+        let config = SnowIDConfig::builder().enable_spin(true).spin_loops(10).build();
         let result = spin_wait(100, &config, || 200);
         assert_eq!(result, Some(200));
     }

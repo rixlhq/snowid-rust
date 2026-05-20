@@ -10,7 +10,6 @@
 //! - 🌐 Distributed-ready
 
 #![forbid(unsafe_code)]
-
 // Clippy lint configuration — keeps code small, readable, and AI-slop-free.
 // These mirror our JS/TS (oxlint) and Go (golangci-lint) rules:
 //   - max 3 params, max 50 lines/func, max depth 3, max complexity 10

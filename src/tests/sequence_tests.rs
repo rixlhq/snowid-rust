@@ -78,10 +78,8 @@ mod tests {
         assert_ids_monotonic(&ids);
 
         // Analyze timestamp distribution
-        let timestamps: HashSet<_> = ids
-            .iter()
-            .map(|id| generator.extract.timestamp(*id))
-            .collect();
+        let timestamps: HashSet<_> =
+            ids.iter().map(|id| generator.extract.timestamp(*id)).collect();
         assert!(timestamps.len() >= 1, "Should have at least one timestamp");
     }
 }
