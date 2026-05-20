@@ -64,10 +64,7 @@ mod tests {
     #[test]
     fn test_multiple_generators_same_time() {
         let gens: Vec<_> = (0..5).map(|i| SnowID::new(i).unwrap()).collect();
-        let tss: Vec<_> = gens
-            .iter()
-            .map(|g| g.extract.timestamp(g.generate()))
-            .collect();
+        let tss: Vec<_> = gens.iter().map(|g| g.extract.timestamp(g.generate())).collect();
 
         let (min, max) = (*tss.iter().min().unwrap(), *tss.iter().max().unwrap());
         assert!(max - min <= 10, "Timestamps spread too wide");
@@ -98,10 +95,7 @@ mod tests {
     #[test]
     fn test_different_node_bits_configs() {
         for node_bits in [6u8, 10, 14, 16] {
-            let cfg = SnowIDConfig::builder()
-                .node_bits(node_bits)
-                .unwrap()
-                .build();
+            let cfg = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let g = SnowID::with_config(0, cfg).unwrap();
             assert_timestamp_accurate(g.extract.timestamp(g.generate()), g.config.epoch(), 10);
         }

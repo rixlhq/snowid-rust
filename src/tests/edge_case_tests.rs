@@ -43,11 +43,7 @@ mod tests {
     /// Verify ID bit structure: timestamp | node | sequence
     #[test]
     fn test_id_bit_structure() {
-        let cfg = SnowIDConfig::builder()
-            .node_bits(10)
-            .unwrap()
-            .epoch(0)
-            .build();
+        let cfg = SnowIDConfig::builder().node_bits(10).unwrap().epoch(0).build();
         let g = SnowID::with_config(0b1010101010, cfg).unwrap();
 
         let id = g.generate();
