@@ -24,6 +24,7 @@ use wait::{sleep_until_next_ms, spin_wait};
 /// Main ID generator with cache-line alignment
 #[derive(Debug)]
 #[repr(align(64))]
+#[allow(clippy::large_stack_frames)]
 pub struct SnowID {
     // === Hot path fields ===
     pub(crate) state: AtomicU64,
@@ -106,6 +107,7 @@ impl SnowID {
 
     #[inline(always)]
     #[allow(dead_code)] // Used in extractor.rs tests
+    #[allow(clippy::too_many_arguments)]
     pub(crate) fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
         ((ts & self.config.timestamp_mask()) << self.config.timestamp_shift())
             | ((node as u64) << self.config.node_shift())
