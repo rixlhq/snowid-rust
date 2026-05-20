@@ -22,26 +22,24 @@ impl SnowIDExtractor {
     /// Extract node component from a SnowID
     #[inline(always)]
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn node(&self, id: u64) -> u16 {
-        ((id >> self.config.node_shift()) & self.config.node_mask() as u64) as u16
+        ((id >> self.config.node_shift()) & u64::from(self.config.node_mask())) as u16
     }
 
     /// Extract sequence component from a SnowID
     #[inline(always)]
     #[must_use]
+    #[allow(clippy::cast_possible_truncation)]
     pub fn sequence(&self, id: u64) -> u16 {
-        (id & self.config.sequence_mask() as u64) as u16
+        (id & u64::from(self.config.sequence_mask())) as u16
     }
 
     /// Decompose SnowID into its components: timestamp, node ID, and sequence
-    /// Optimized to extract all components in a single pass
     #[inline]
     #[must_use]
     pub fn decompose(&self, id: u64) -> (u64, u16, u16) {
-        let timestamp = (id >> self.config.timestamp_shift()) & self.config.timestamp_mask();
-        let node = ((id >> self.config.node_shift()) & self.config.node_mask() as u64) as u16;
-        let sequence = (id & self.config.sequence_mask() as u64) as u16;
-        (timestamp, node, sequence)
+        (self.timestamp(id), self.node(id), self.sequence(id))
     }
 }
 
