@@ -11,7 +11,6 @@ use_field_init_shorthand = true
 use_try_shorthand = true
 
 # Format doc comments
-format_code_in_doc_comments = true
 
 # Reorder imports
 reorder_imports = true
@@ -26,4 +25,3 @@ merge_derives = true
 chain_width = 80
 
 # Single line max width for match arms
-single_line_ellipsis_width = 60
