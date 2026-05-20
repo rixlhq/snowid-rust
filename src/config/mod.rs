@@ -22,7 +22,7 @@ pub enum SnowIDConfigError {
 
 impl fmt::Display for SnowIDConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
+        match *self {
             SnowIDConfigError::InvalidNodeBits { bits } => {
                 write!(f, "Node bits {} must be between 6 and 16", bits)
             }
@@ -52,13 +52,13 @@ pub struct SnowIDConfig {
 
 impl SnowIDConfig {
     /// Calculate mask for given number of bits
-    #[inline]
+    #[allow(clippy::cast_possible_truncation)] // bits is 6-16, max value 65535 fits in u16
     pub(crate) const fn calculate_mask(bits: u8) -> u16 {
         ((1u32 << bits) - 1) as u16
     }
 
     /// Create new SnowIDConfig with given node bits
-    fn new(node_bits: u8, custom_epoch: u64) -> Self {
+    const fn new(node_bits: u8, custom_epoch: u64) -> Self {
         let sequence_bits = SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - node_bits;
         Self {
             node_bits,
@@ -75,6 +75,7 @@ impl SnowIDConfig {
     }
 
     /// Create config from builder
+    #[allow(clippy::missing_const_for_fn)] // uses let mut, cannot be const
     pub(crate) fn from_builder(b: SnowIDConfigBuilder) -> Self {
         let mut cfg = Self::new(b.node_bits, b.custom_epoch);
         cfg.spin_enabled = b.spin_enabled;
@@ -84,46 +85,55 @@ impl SnowIDConfig {
     }
 
     /// Create a new configuration builder
-    pub fn builder() -> SnowIDConfigBuilder {
+    #[must_use]
+    pub const fn builder() -> SnowIDConfigBuilder {
         SnowIDConfigBuilder::new()
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn epoch(&self) -> u64 {
         self.custom_epoch
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn node_bits(&self) -> u8 {
         self.node_bits
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn sequence_bits(&self) -> u8 {
         SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - self.node_bits
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn max_node_id(&self) -> u16 {
         self.node_mask
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn max_sequence_id(&self) -> u16 {
         self.sequence_mask
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_enabled(&self) -> bool {
         self.spin_enabled
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_loops(&self) -> u32 {
         self.spin_loops
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_yield_every(&self) -> u32 {
         self.spin_yield_every
     }

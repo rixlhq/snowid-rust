@@ -30,7 +30,6 @@
     clippy::print_stderr,
     clippy::wildcard_imports
 )]
-
 // === Pedantic lints (warn) — catch AI verbosity and redundancy ===
 #![warn(
     clippy::redundant_closure_for_method_calls,
@@ -52,7 +51,6 @@
     clippy::pattern_type_mismatch,
     clippy::match_like_matches_macro
 )]
-
 // === Complexity lints (warn) — prevent AI from writing overly complex code ===
 #![warn(
     clippy::cognitive_complexity,
@@ -65,7 +63,6 @@
     clippy::verbose_bit_mask,
     clippy::branches_sharing_code
 )]
-
 // === Style lints (warn) — eliminate AI slop patterns ===
 #![warn(
     clippy::needless_borrow,
@@ -97,7 +94,7 @@
     clippy::must_use_candidate,
     clippy::missing_const_for_fn,
     clippy::self_named_constructors,
-    clippy::enum_glob_use,
+    clippy::enum_glob_use
 )]
 
 pub mod base62;

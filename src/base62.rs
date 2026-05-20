@@ -14,6 +14,8 @@ pub const MAX_LEN: usize = 11;
 /// Zero-allocation base62 encoding to a fixed-size array
 /// Returns the array and the actual length of encoded bytes
 #[inline]
+#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible
+#[must_use]
 pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
     let mut buf = [0u8; MAX_LEN];
     let len = base62::encode_bytes(id, &mut buf).unwrap();
@@ -23,6 +25,7 @@ pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
 /// Zero-allocation base62 encoding into caller-provided buffer
 /// Returns a str slice of the encoded portion
 #[inline]
+#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible; ASCII is valid UTF-8
 pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
     let len = base62::encode_bytes(id, buf).unwrap();
     // base62 output is always valid ASCII
@@ -32,6 +35,8 @@ pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
 /// Base62 encode with String allocation (convenience wrapper)
 /// For hot paths, prefer `encode_array` or `encode_into`
 #[inline]
+#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible; ASCII is valid UTF-8
+#[must_use]
 pub fn encode(id: u64) -> String {
     let (buf, len) = encode_array(id);
     // base62 output is always valid ASCII
@@ -43,11 +48,11 @@ pub fn decode(encoded: &str) -> Result<u64, DecodeError> {
     let decoded = base62::decode(encoded).map_err(DecodeError::from)?;
 
     // Check if the decoded value fits in a u64
-    let Ok(value) = u64::try_from(decoded) else {
+    let Ok(decoded_value) = u64::try_from(decoded) else {
         return Err(DecodeError::Overflow);
     };
 
-    Ok(value)
+    Ok(decoded_value)
 }
 
 /// Error type for base62 decoding operations
@@ -63,18 +68,18 @@ pub enum DecodeError {
 
 impl fmt::Display for DecodeError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            DecodeError::InvalidCharacter => write!(f, "Invalid base62 character"),
-            DecodeError::Overflow => write!(f, "Decoded value would overflow u64"),
-            DecodeError::Other(e) => write!(f, "Base62 decode error: {}", e),
+        match *self {
+            Self::InvalidCharacter => write!(f, "Invalid base62 character"),
+            Self::Overflow => write!(f, "Decoded value would overflow u64"),
+            Self::Other(ref e) => write!(f, "Base62 decode error: {}", e),
         }
     }
 }
 
 impl Error for DecodeError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
-        match self {
-            DecodeError::Other(e) => Some(e),
+        match *self {
+            Self::Other(ref e) => Some(e),
             _ => None,
         }
     }
