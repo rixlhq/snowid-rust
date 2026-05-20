@@ -8,14 +8,14 @@ pub struct SnowIDExtractor {
 
 impl SnowIDExtractor {
     /// Create a new SnowID extractor with the given configuration
-    pub(crate) fn new(config: SnowIDConfig) -> Self {
+    pub(crate) const fn new(config: SnowIDConfig) -> Self {
         Self { config }
     }
 
     /// Extract timestamp component from a SnowID
     #[inline(always)]
     #[must_use]
-    pub fn timestamp(&self, id: u64) -> u64 {
+    pub const fn timestamp(&self, id: u64) -> u64 {
         (id >> self.config.timestamp_shift()) & self.config.timestamp_mask()
     }
 
