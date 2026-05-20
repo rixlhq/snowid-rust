@@ -84,46 +84,55 @@ impl SnowIDConfig {
     }
 
     /// Create a new configuration builder
+    #[must_use]
     pub fn builder() -> SnowIDConfigBuilder {
         SnowIDConfigBuilder::new()
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn epoch(&self) -> u64 {
         self.custom_epoch
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn node_bits(&self) -> u8 {
         self.node_bits
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn sequence_bits(&self) -> u8 {
         SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - self.node_bits
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn max_node_id(&self) -> u16 {
         self.node_mask
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn max_sequence_id(&self) -> u16 {
         self.sequence_mask
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_enabled(&self) -> bool {
         self.spin_enabled
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_loops(&self) -> u32 {
         self.spin_loops
     }
 
     #[inline(always)]
+    #[must_use]
     pub const fn spin_yield_every(&self) -> u32 {
         self.spin_yield_every
     }

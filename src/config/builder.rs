@@ -21,7 +21,7 @@ pub struct SnowIDConfigBuilder {
 
 impl SnowIDConfigBuilder {
     /// Create a new SnowIDConfigBuilder with default values
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         Self {
             node_bits: DEFAULT_NODE_BITS,
             custom_epoch: DEFAULT_CUSTOM_EPOCH,
