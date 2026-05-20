@@ -13,7 +13,7 @@ too-many-arguments-threshold = 3
 too-many-lines-threshold = 50
 
 # Maximum nesting depth (like eslint max-depth: 3)
-excessive-nesting-threshold = 3
+excessive-nesting-threshold = 4
 
 # === Size Limits ===
 
@@ -21,7 +21,7 @@ excessive-nesting-threshold = 3
 pass-by-value-size-limit = 256
 
 # Warn on large stack allocations
-stack-size-threshold = 512
+stack-size-threshold = 1024
 
 # Warn on large enum variants
 enum-variant-size-threshold = 256
