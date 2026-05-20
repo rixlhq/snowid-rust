@@ -1,0 +1,39 @@
+# Clippy configuration for snowid-rust
+# Enforces code quality rules similar to our JS/TS (oxlint) and Go (golangci-lint) setups
+
+# === Complexity Limits ===
+
+# Cognitive complexity threshold (like eslint complexity: 10, gocognit)
+cognitive-complexity-threshold = 10
+
+# Maximum number of function parameters (like eslint max-params: 3)
+too-many-arguments-threshold = 3
+
+# Maximum lines per function (like eslint max-lines-per-function: 50)
+too-many-lines-threshold = 50
+
+# Maximum nesting depth (like eslint max-depth: 3)
+excessive-nesting-threshold = 3
+
+# === Size Limits ===
+
+# Warn when passing large structs by value
+pass-by-value-size-limit = 256
+
+# Warn on large stack allocations
+stack-size-threshold = 512
+
+# Warn on large enum variants
+enum-variant-size-threshold = 256
+
+# Warn on unnecessary Vec<Box<T>> when T is large
+vec-box-size-threshold = 256
+
+# === Readability ===
+
+# Minimum digits before suggesting underscore separators
+literal-representation-threshold = 16
+
+# Allowed clippy lints that are too pedantic for this codebase
+# (uncomment as needed)
+# allow-unwrap-in-tests = true
