@@ -11,6 +11,36 @@
 
 #![forbid(unsafe_code)]
 
+// Clippy lint configuration — keeps code small, readable, and AI-slop-free.
+// These mirror our JS/TS (oxlint) and Go (golangci-lint) rules:
+//   - max 3 params, max 50 lines/func, max depth 3, max complexity 10
+//   - no long lines, no repetitive code, no oversized types
+#![warn(
+    clippy::cognitive_complexity,
+    clippy::too_many_arguments,
+    clippy::too_many_lines,
+    clippy::excessive_nesting,
+    clippy::large_enum_variant,
+    clippy::large_stack_frames,
+    clippy::type_repetition_in_bounds,
+    clippy::verbose_bit_mask,
+    clippy::needless_borrow,
+    clippy::redundant_clone,
+    clippy::redundant_closure,
+    clippy::match_same_arms,
+    clippy::single_match_else,
+    clippy::manual_unwrap_or,
+    clippy::manual_map,
+    clippy::unnecessary_fold,
+    clippy::branches_sharing_code,
+    clippy::needless_return,
+    clippy::collapsible_if,
+    clippy::collapsible_match,
+    clippy::unnecessary_to_owned,
+    clippy::inefficient_to_string,
+    clippy::implicit_clone
+)]
+
 pub mod base62;
 mod config;
 mod error;
