@@ -85,7 +85,7 @@ impl SnowIDConfig {
 
     /// Create a new configuration builder
     #[must_use]
-    pub fn builder() -> SnowIDConfigBuilder {
+    pub const fn builder() -> SnowIDConfigBuilder {
         SnowIDConfigBuilder::new()
     }
 
