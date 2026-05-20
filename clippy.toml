@@ -29,11 +29,39 @@ enum-variant-size-threshold = 256
 # Warn on unnecessary Vec<Box<T>> when T is large
 vec-box-size-threshold = 256
 
+# === Type Complexity ===
+
+# Maximum type complexity before warning (prevents AI from creating huge generic types)
+type-complexity-threshold = 200
+
 # === Readability ===
 
 # Minimum digits before suggesting underscore separators
 literal-representation-threshold = 16
 
-# Allowed clippy lints that are too pedantic for this codebase
-# (uncomment as needed)
-# allow-unwrap-in-tests = true
+# === Naming Conventions ===
+
+# Disallow generic placeholder names that AI models love to generate
+disallowed-names = [
+    "foo", "bar", "baz", "quux",
+    "tmp", "temp",
+    "data", "result", "output", "input",
+    "val", "value",
+    "item", "elem", "thing",
+    "stuff", "misc",
+]
+
+# === Trait Bounds ===
+
+# Maximum number of trait bounds on a single type (prevents AI trait bound explosion)
+max-trait-bounds = 4
+
+# === Enum Variant Naming ===
+
+# Minimum enum variant name length before linting
+enum-variant-name-threshold = 3
+
+# === Import Style ===
+
+# Warn on wildcard imports (AI loves `use foo::*`)
+warn-on-all-wildcard-imports = true
