@@ -10,7 +10,7 @@ pub enum SnowIDError {
 
 impl fmt::Display for SnowIDError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
+        match *self {
             SnowIDError::InvalidNodeId { node_id, max } => {
                 write!(
                     f,
