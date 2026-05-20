@@ -15,28 +15,28 @@ impl SnowID {
         let now = self.now_ms();
         let current = State::from_raw(self.state.load(Ordering::Acquire));
 
-        // Fast path 1: time advanced
-        if now > current.timestamp() {
-            if let Some(id) = self.try_claim_millisecond(current, now) {
-                return id;
-            }
-            return self.generate_slow_path();
-        }
-
-        // Fast path 2: same millisecond, sequence available
-        if let Some(id) = self.try_increment_sequence(current) {
+        // Fast path: try to claim or increment
+        if let Some(id) = self.try_generate_once(now, current) {
             return id;
         }
 
         self.generate_slow_path()
     }
 
+    /// Attempt a single generation: claim new ms or increment sequence.
+    #[inline]
+    fn try_generate_once(&self, now: u64, current: State) -> Option<u64> {
+        if now > current.timestamp() {
+            return self.try_claim_millisecond(current, now);
+        }
+        self.try_increment_sequence(current)
+    }
+
     /// Try to claim new millisecond with sequence 0
     #[inline]
     pub(crate) fn try_claim_millisecond(&self, current: State, new_ts: u64) -> Option<u64> {
         let new_state = State::new(new_ts, 0);
-        self.cas_state(current, new_state)
-            .then(|| self.assemble_id(new_ts, 0))
+        self.cas_state(current, new_state).then(|| self.assemble_id(new_ts, 0))
     }
 
     /// Try to increment sequence within current millisecond
@@ -73,19 +73,13 @@ impl SnowID {
         loop {
             let now = self.now_ms();
             let current = State::from_raw(self.state.load(Ordering::Acquire));
+            let timestamp = current.timestamp();
 
-            if now > current.timestamp() {
-                if let Some(id) = self.try_claim_millisecond(current, now) {
-                    return id;
-                }
-                continue;
-            }
-
-            if let Some(id) = self.try_increment_sequence(current) {
+            if let Some(id) = self.try_generate_once(now, current) {
                 return id;
             }
 
-            self.wait_next_millis(current.timestamp(), backoff_ms);
+            self.wait_next_millis(timestamp, backoff_ms);
             backoff_ms = next_backoff(backoff_ms);
         }
     }
