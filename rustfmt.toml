@@ -1,0 +1,29 @@
+# rustfmt configuration for snowid-rust
+# Keeps lines short and files readable
+
+# Maximum line width (matches common eslint max-len / prettier printWidth)
+max_width = 100
+
+# Use field init shorthand
+use_field_init_shorthand = true
+
+# Use try shorthand (? operator)
+use_try_shorthand = true
+
+# Format doc comments
+format_code_in_doc_comments = true
+
+# Reorder imports
+reorder_imports = true
+
+# Reorder modules
+reorder_modules = true
+
+# Merge derives
+merge_derives = true
+
+# Chain width (how short a chain can be before it breaks)
+chain_width = 80
+
+# Single line max width for match arms
+single_line_ellipsis_width = 60
