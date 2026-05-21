@@ -34,6 +34,7 @@ impl SnowID {
     }
 
     /// Decode a base62 encoded SnowID back to its raw u64 value
+    #[allow(clippy::unused_self)] // intentional: keeps consistent method-based API on SnowID
     pub fn decode_base62(&self, encoded: &str) -> Result<u64, Base62DecodeError> {
         base62_decode(encoded)
     }
