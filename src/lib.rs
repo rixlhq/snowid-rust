@@ -99,7 +99,6 @@
     clippy::useless_conversion,
     clippy::double_must_use,
     clippy::must_use_candidate,
-    clippy::missing_const_for_fn,
     clippy::self_named_constructors,
     clippy::enum_glob_use
 )]

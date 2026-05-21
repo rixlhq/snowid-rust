@@ -71,7 +71,6 @@ impl SnowIDConfig {
     }
 
     /// Create config from builder
-    #[allow(clippy::missing_const_for_fn)] // uses let mut, cannot be const
     #[allow(clippy::needless_pass_by_value)] // builder is consumed, fields are moved into Self
     pub(crate) fn from_builder(b: SnowIDConfigBuilder) -> Self {
         let mut cfg = Self::new(b.node_bits, b.custom_epoch);
