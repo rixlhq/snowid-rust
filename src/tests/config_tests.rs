@@ -10,10 +10,7 @@ mod tests {
         for bits in 6..=16 {
             let config = SnowIDConfig::builder().node_bits(bits).unwrap().build();
             assert_eq!(config.node_bits(), bits);
-            assert_eq!(
-                config.sequence_bits(),
-                SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - bits
-            );
+            assert_eq!(config.sequence_bits(), SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - bits);
         }
     }
 

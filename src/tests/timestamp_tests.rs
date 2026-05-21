@@ -118,12 +118,7 @@ mod tests {
             let ts2 = g.extract.timestamp(g.generate());
 
             let diff = ts2 - ts1;
-            assert!(
-                diff >= (ms * 7 / 10) && diff <= ms * 2 + 5,
-                "Sleep {}ms: got {}ms",
-                ms,
-                diff
-            );
+            assert!(diff >= (ms * 7 / 10) && diff <= ms * 2 + 5, "Sleep {}ms: got {}ms", ms, diff);
         }
     }
 

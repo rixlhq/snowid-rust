@@ -146,11 +146,7 @@ mod tests {
         let ts = g.extract.timestamp(id);
 
         // Timestamp should be reasonable (within ~2 years of epoch)
-        assert!(
-            ts < 2 * 365 * 24 * 60 * 60 * 1000,
-            "Expected ts < 2 years, got {}",
-            ts
-        );
+        assert!(ts < 2 * 365 * 24 * 60 * 60 * 1000, "Expected ts < 2 years, got {}", ts);
     }
 
     /// Test all supported node_bits configurations
@@ -205,10 +201,7 @@ mod tests {
 
             // Reconstruct ID manually
             let reconstructed = (ts << 22) | ((node as u64) << 12) | (seq as u64);
-            assert_eq!(
-                id, reconstructed,
-                "ID should round-trip through decomposition"
-            );
+            assert_eq!(id, reconstructed, "ID should round-trip through decomposition");
         }
     }
 }

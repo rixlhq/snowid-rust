@@ -34,11 +34,7 @@ fn main() {
     println!("  Timestamp: {ts} ms since epoch");
     println!("  Human date: {datetime}");
     println!("  Node ID: {node} (of {})", generator.config.max_node_id());
-    println!(
-        "  Sequence: {} (of {})",
-        seq,
-        generator.config.max_sequence_id()
-    );
+    println!("  Sequence: {} (of {})", seq, generator.config.max_sequence_id());
 
     // Generate a few more IDs to demonstrate monotonicity
     println!("\nGenerating a sequence of IDs:");

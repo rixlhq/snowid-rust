@@ -77,13 +77,9 @@ pub fn base62_decoding(c: &mut Criterion) {
         // Pre-encode the value for decoding benchmarks
         let encoded = base62_encode(value);
 
-        group.bench_with_input(
-            BenchmarkId::new("base62_decode", value),
-            &encoded,
-            |b, encoded| {
-                b.iter(|| black_box(base62_decode(encoded).unwrap()));
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("base62_decode", value), &encoded, |b, encoded| {
+            b.iter(|| black_box(base62_decode(encoded).unwrap()));
+        });
     }
 
     group.finish();
@@ -93,16 +89,12 @@ pub fn roundtrip_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Base62 Roundtrip");
 
     for &value in &TEST_VALUES {
-        group.bench_with_input(
-            BenchmarkId::new("base62_roundtrip", value),
-            &value,
-            |b, &value| {
-                b.iter(|| {
-                    let encoded = base62_encode(value);
-                    black_box(base62_decode(&encoded).unwrap());
-                });
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("base62_roundtrip", value), &value, |b, &value| {
+            b.iter(|| {
+                let encoded = base62_encode(value);
+                black_box(base62_decode(&encoded).unwrap());
+            });
+        });
     }
 
     group.finish();
