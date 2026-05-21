@@ -107,7 +107,6 @@ impl SnowID {
 
     #[inline(always)]
     #[allow(dead_code)] // Used in extractor.rs tests
-    #[allow(clippy::too_many_arguments)]
     pub(crate) const fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
         ((ts & self.config.timestamp_mask()) << self.config.timestamp_shift()) | ((node as u64) << self.config.node_shift()) | (seq as u64)
     }

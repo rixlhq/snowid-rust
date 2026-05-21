@@ -63,7 +63,6 @@
 // === Complexity lints (warn) — prevent AI from writing overly complex code ===
 #![warn(
     clippy::cognitive_complexity,
-    clippy::too_many_arguments,
     clippy::too_many_lines,
     clippy::excessive_nesting,
     clippy::large_enum_variant,
