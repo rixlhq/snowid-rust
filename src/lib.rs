@@ -10,8 +10,6 @@
 //! - 🌐 Distributed-ready
 
 #![forbid(unsafe_code)]
-// Clippy lint configuration is centralized in Cargo.toml [lints] table
-// and clippy.toml thresholds. See those files for all rules.
 
 pub mod base62;
 mod config;
