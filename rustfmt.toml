@@ -1,21 +1,12 @@
-# rustfmt configuration for snowid-rust
-# Compact formatting inspired by our TypeScript oxfmt setup (printWidth: 140)
-
-# === Line Width ===
 max_width = 140
 
-# === Shorthands ===
 use_field_init_shorthand = true
 use_try_shorthand = true
 
-# === Import style ===
 reorder_imports = true
 reorder_modules = true
-
-# === Derives ===
 merge_derives = true
 
-# === Compact layouts ===
 fn_params_layout = "Compressed"
 use_small_heuristics = "Max"
 array_width = 100

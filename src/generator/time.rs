@@ -2,7 +2,6 @@
 //!
 //! Provides wall-clock time in milliseconds since custom epoch
 //!
-//! `expect()` and `as u64` casts are safe: SystemTime before Unix epoch is impossible on real systems.
 #![allow(clippy::expect_used, clippy::cast_possible_truncation)]
 
 use std::time::{SystemTime, UNIX_EPOCH};

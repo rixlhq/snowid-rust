@@ -1,4 +1,3 @@
-//! `cast_possible_truncation` is safe: masks guarantee values fit in u16.
 #![allow(clippy::cast_possible_truncation)]
 
 use crate::config::SnowIDConfig;
@@ -54,20 +53,16 @@ mod tests {
         let config = SnowIDConfig::default();
         let snowid_gen = SnowID::with_config(42, config).unwrap();
 
-        // Create a known SnowID value with specific components
         let timestamp: u64 = 0x1234567;
         let node: u16 = 42;
         let sequence: u16 = 123;
 
-        // Create SnowID using the generator's method (no duplicate helper needed)
         let id = snowid_gen.create_snowid_with_node(timestamp, node, sequence);
 
-        // Test individual component extraction
         assert_eq!(snowid_gen.extract.timestamp(id), timestamp);
         assert_eq!(snowid_gen.extract.node(id), node);
         assert_eq!(snowid_gen.extract.sequence(id), sequence);
 
-        // Test combined extraction
         let (ext_timestamp, ext_node, ext_sequence) = snowid_gen.extract.decompose(id);
         assert_eq!(ext_timestamp, timestamp);
         assert_eq!(ext_node, node);
@@ -79,12 +74,10 @@ mod tests {
         let config = SnowIDConfig::default();
         let snowid_gen = SnowID::with_config(1, config).unwrap();
 
-        // Test maximum values
         let max_timestamp = (1u64 << 42) - 1;
         let max_node_id = config.max_node_id();
         let max_sequence = config.max_sequence_id();
 
-        // Create SnowID using maximum values
         let id = snowid_gen.create_snowid_with_node(max_timestamp, max_node_id, max_sequence);
 
         assert_eq!(snowid_gen.extract.timestamp(id), max_timestamp);

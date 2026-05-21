@@ -5,7 +5,6 @@
 //! - `encode_into`: Writes to caller buffer
 //! - `encode`: Convenience String wrapper
 //!
-//! `unwrap()` is safe here: base62 encoding a u64 into 11 bytes is infallible, and base62 output is always valid ASCII/UTF-8.
 #![allow(clippy::unwrap_used)]
 
 use std::error::Error;
@@ -29,7 +28,6 @@ pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
 #[inline]
 pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
     let len = base62::encode_bytes(id, buf).unwrap();
-    // base62 output is always valid ASCII
     std::str::from_utf8(&buf[..len]).unwrap()
 }
 
@@ -39,7 +37,6 @@ pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
 #[must_use]
 pub fn encode(id: u64) -> String {
     let (buf, len) = encode_array(id);
-    // base62 output is always valid ASCII
     std::str::from_utf8(&buf[..len]).unwrap().to_owned()
 }
 
@@ -47,7 +44,6 @@ pub fn encode(id: u64) -> String {
 pub fn decode(encoded: &str) -> Result<u64, DecodeError> {
     let decoded = base62::decode(encoded).map_err(DecodeError::from)?;
 
-    // Check if the decoded value fits in a u64
     let Ok(decoded_value) = u64::try_from(decoded) else {
         return Err(DecodeError::Overflow);
     };
@@ -125,14 +121,12 @@ mod tests {
 
     #[test]
     fn test_max_len() {
-        // u64::MAX should fit in 11 characters
         let (_, len) = encode_array(u64::MAX);
         assert!(len <= MAX_LEN);
     }
 
     #[test]
     fn test_decode_error() {
-        // Invalid characters
         assert!(decode("!!!").is_err());
     }
 }

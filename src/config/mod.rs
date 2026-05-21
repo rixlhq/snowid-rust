@@ -1,6 +1,5 @@
 //! Configuration for SnowID generator
 //!
-//! `cast_possible_truncation` is safe: bits is 6-16, max value 65535 fits in u16.
 #![allow(clippy::cast_possible_truncation)]
 
 mod builder;
