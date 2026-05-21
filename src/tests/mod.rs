@@ -1,4 +1,11 @@
-#![allow(clippy::unwrap_used, clippy::panic, clippy::excessive_nesting, clippy::cast_possible_wrap, clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+#![allow(
+    clippy::unwrap_used,
+    clippy::panic,
+    clippy::excessive_nesting,
+    clippy::cast_possible_wrap,
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss
+)]
 mod base62_tests;
 mod boundary_tests;
 mod concurrent_tests;
