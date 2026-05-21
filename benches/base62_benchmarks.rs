@@ -49,22 +49,14 @@ pub fn base62_encoding(c: &mut Criterion) {
 
     for &value in &TEST_VALUES {
         // String-allocating version
-        group.bench_with_input(
-            BenchmarkId::new("base62_encode_string", value),
-            &value,
-            |b, &value| {
-                b.iter(|| black_box(base62_encode(value)));
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("base62_encode_string", value), &value, |b, &value| {
+            b.iter(|| black_box(base62_encode(value)));
+        });
 
         // Zero-alloc array version
-        group.bench_with_input(
-            BenchmarkId::new("base62_encode_array", value),
-            &value,
-            |b, &value| {
-                b.iter(|| black_box(base62_encode_array(value)));
-            },
-        );
+        group.bench_with_input(BenchmarkId::new("base62_encode_array", value), &value, |b, &value| {
+            b.iter(|| black_box(base62_encode_array(value)));
+        });
     }
 
     group.finish();
@@ -100,11 +92,5 @@ pub fn roundtrip_benchmark(c: &mut Criterion) {
     group.finish();
 }
 
-criterion_group!(
-    benches,
-    id_generation_comparison,
-    base62_encoding,
-    base62_decoding,
-    roundtrip_benchmark
-);
+criterion_group!(benches, id_generation_comparison, base62_encoding, base62_decoding, roundtrip_benchmark);
 criterion_main!(benches);

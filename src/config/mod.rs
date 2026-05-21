@@ -6,10 +6,7 @@ use std::error::Error;
 use std::fmt;
 
 pub use builder::SnowIDConfigBuilder;
-use builder::{
-    DEFAULT_CUSTOM_EPOCH, DEFAULT_NODE_BITS, DEFAULT_SPIN_ENABLED, DEFAULT_SPIN_LOOPS,
-    DEFAULT_SPIN_YIELD_EVERY,
-};
+use builder::{DEFAULT_CUSTOM_EPOCH, DEFAULT_NODE_BITS, DEFAULT_SPIN_ENABLED, DEFAULT_SPIN_LOOPS, DEFAULT_SPIN_YIELD_EVERY};
 
 use crate::SnowID;
 

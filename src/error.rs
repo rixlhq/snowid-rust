@@ -27,10 +27,7 @@ mod tests {
     #[test]
     fn test_error_display() {
         let invalid_node = SnowIDError::InvalidNodeId { node_id: 1024, max: 1023 };
-        assert_eq!(
-            invalid_node.to_string(),
-            "Node ID 1024 is invalid. Maximum allowed value is 1023"
-        );
+        assert_eq!(invalid_node.to_string(), "Node ID 1024 is invalid. Maximum allowed value is 1023");
     }
 
     #[test]

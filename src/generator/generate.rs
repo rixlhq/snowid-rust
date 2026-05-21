@@ -47,8 +47,7 @@ impl SnowID {
         }
         let new_seq = current.sequence() + 1;
         let new_state = State::new(current.timestamp(), new_seq);
-        self.cas_state(current, new_state)
-            .then(|| self.assemble_id(current.timestamp(), new_seq))
+        self.cas_state(current, new_state).then(|| self.assemble_id(current.timestamp(), new_seq))
     }
 
     /// Atomic compare-and-swap on state
