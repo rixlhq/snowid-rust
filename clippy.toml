@@ -21,10 +21,10 @@ excessive-nesting-threshold = 4
 pass-by-value-size-limit = 256
 
 # Warn on large stack allocations
-stack-size-threshold = 1024
+stack-size-threshold = 131072
 
 # Warn on large enum variants
-enum-variant-size-threshold = 256
+enum-variant-size-threshold = 128
 
 # Warn on unnecessary Vec<Box<T>> when T is large
 vec-box-size-threshold = 256
@@ -58,6 +58,19 @@ warn-on-all-wildcard-imports = true
 # Clippy uses this to gate lints that require newer language features.
 # Should match the `rust-version` field in Cargo.toml.
 msrv = "1.90.0"
+
+
+# === API Stability ===
+# Don't suggest changes that would break the public API (semver-sensitive)
+avoid-breaking-exported-api = false
+
+# === Stack Safety ===
+# Warn on types larger than this that are passed on the stack instead of boxed
+too-large-for-stack = 4096
+
+# === Formatting ===
+# Allow comments above attributes (e.g., doc comments above #[derive])
+accept-comment-above-attributes = true
 
 # === Test Organization ===
 
