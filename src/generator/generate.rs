@@ -53,9 +53,7 @@ impl SnowID {
     /// Atomic compare-and-swap on state
     #[inline(always)]
     pub(crate) fn cas_state(&self, expected: State, new: State) -> bool {
-        self.state
-            .compare_exchange_weak(expected.raw(), new.raw(), Ordering::AcqRel, Ordering::Acquire)
-            .is_ok()
+        self.state.compare_exchange(expected.raw(), new.raw(), Ordering::AcqRel, Ordering::Acquire).is_ok()
     }
 
     /// Slow path for contended generation
