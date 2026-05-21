@@ -130,7 +130,6 @@
     clippy::borrow_deref_ref,               // &*x when deref/coercion works
 
     // --- Unnecessary operations ---
-    clippy::needless_pass_by_value,         // pass by ref when value is small
     clippy::unused_unit,                    // unnecessary () return
     clippy::unused_self,                    // self parameter that isn't used
     clippy::redundant_pub_crate,            // pub(crate) when private suffices
