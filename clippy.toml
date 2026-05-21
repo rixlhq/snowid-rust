@@ -65,3 +65,9 @@ enum-variant-name-threshold = 3
 
 # Warn on wildcard imports (AI loves `use foo::*`)
 warn-on-all-wildcard-imports = true
+
+# === Test Organization ===
+
+# Allow unwrap/expect in tests (test code has different standards)
+allow-unwrap-in-tests = true
+allow-expect-in-tests = true
