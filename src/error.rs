@@ -17,7 +17,7 @@ impl fmt::Display for SnowIDError {
                     "Node ID {} is invalid. Maximum allowed value is {}",
                     node_id, max
                 )
-            }
+            },
         }
     }
 }
@@ -30,10 +30,7 @@ mod tests {
 
     #[test]
     fn test_error_display() {
-        let invalid_node = SnowIDError::InvalidNodeId {
-            node_id: 1024,
-            max: 1023,
-        };
+        let invalid_node = SnowIDError::InvalidNodeId { node_id: 1024, max: 1023 };
         assert_eq!(
             invalid_node.to_string(),
             "Node ID 1024 is invalid. Maximum allowed value is 1023"
@@ -42,19 +39,13 @@ mod tests {
 
     #[test]
     fn test_error_debug() {
-        let invalid_node = SnowIDError::InvalidNodeId {
-            node_id: 1024,
-            max: 1023,
-        };
+        let invalid_node = SnowIDError::InvalidNodeId { node_id: 1024, max: 1023 };
         assert!(format!("{invalid_node:?}").contains("InvalidNodeId"));
     }
 
     #[test]
     fn test_error_clone() {
-        let original = SnowIDError::InvalidNodeId {
-            node_id: 1024,
-            max: 1023,
-        };
+        let original = SnowIDError::InvalidNodeId { node_id: 1024, max: 1023 };
         let cloned = original.clone();
         assert_eq!(original, cloned);
     }

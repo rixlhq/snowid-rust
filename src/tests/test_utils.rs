@@ -59,11 +59,7 @@ pub fn assert_unique_and_monotonic(mut ids: Vec<u64>, expected_count: usize) {
 /// Assert timestamp is accurate within tolerance (ms)
 pub fn assert_timestamp_accurate(ts: u64, epoch: u64, tolerance_ms: u64) {
     let wall_ts = wall_clock_ms(epoch);
-    let diff = if wall_ts >= ts {
-        wall_ts - ts
-    } else {
-        ts - wall_ts
-    };
+    let diff = if wall_ts >= ts { wall_ts - ts } else { ts - wall_ts };
     assert!(
         diff <= tolerance_ms,
         "Timestamp drift: ts={}, wall={}, diff={}ms (max {}ms)",

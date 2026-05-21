@@ -10,7 +10,7 @@ mod tests {
             Err(SnowIDError::InvalidNodeId { node_id, max }) => {
                 assert_eq!(node_id, 1024);
                 assert_eq!(max, 1023);
-            }
+            },
             _ => panic!("Expected InvalidNodeId error"),
         }
     }

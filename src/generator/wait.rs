@@ -60,11 +60,7 @@ where
 #[inline(always)]
 pub const fn next_backoff(current: u64) -> u64 {
     let next = current.saturating_mul(2);
-    if next > MAX_BACKOFF_MS {
-        MAX_BACKOFF_MS
-    } else {
-        next
-    }
+    if next > MAX_BACKOFF_MS { MAX_BACKOFF_MS } else { next }
 }
 
 #[cfg(test)]
