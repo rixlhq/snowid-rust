@@ -1,4 +1,11 @@
-#![allow(clippy::unwrap_used, clippy::panic, clippy::excessive_nesting, clippy::cast_possible_wrap, clippy::cast_possible_truncation, clippy::cast_precision_loss)]
+#![allow(
+    clippy::unwrap_used,
+    clippy::panic,
+    clippy::excessive_nesting,
+    clippy::cast_possible_wrap,
+    clippy::cast_possible_truncation,
+    clippy::cast_precision_loss
+)]
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use snowid::{SnowID, SnowIDConfig};
 use std::hint::black_box;
