@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used, clippy::panic)]
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use snowid::{BASE62_MAX_LEN, SnowID, base62_decode, base62_encode, base62_encode_array};
 use std::hint::black_box;

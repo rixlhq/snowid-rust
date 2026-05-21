@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used, clippy::panic)]
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
 use snowid::{SnowID, SnowIDConfig};
 use std::hint::black_box;

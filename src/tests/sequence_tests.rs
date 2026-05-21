@@ -54,7 +54,7 @@ mod tests {
             }
 
             last_ts = ts;
-            if seq % 10 == 0 {
+            if seq % 1000 == 0 {
                 thread::yield_now();
             }
         }
