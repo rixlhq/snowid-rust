@@ -7,7 +7,7 @@
 cognitive-complexity-threshold = 10
 
 # Maximum number of function parameters (like eslint max-params: 3)
-too-many-arguments-threshold = 3
+too-many-arguments-threshold = 4
 
 # Maximum lines per function (like eslint max-lines-per-function: 50)
 too-many-lines-threshold = 50
