@@ -54,7 +54,6 @@ impl SnowID {
         Ok(Self::build(node_id, config))
     }
 
-    #[allow(clippy::missing_const_for_fn)] // Result return is not const-stable
     fn validate_node_id(node_id: u16, config: &SnowIDConfig) -> Result<(), SnowIDError> {
         let max = config.max_node_id();
         if node_id > max {
