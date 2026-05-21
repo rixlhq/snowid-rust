@@ -1,5 +1,31 @@
 # Changelog
 
+## [2.1.0](https://github.com/rixlhq/snowid-rust/compare/v2.0.3...v2.1.0) (2026-05-21)
+
+
+### Features
+
+* use strong CAS in cas_state to avoid spurious failures under contention ([952ed05](https://github.com/rixlhq/snowid-rust/commit/952ed05df8f133c2159a85afe0572762185d2314))
+
+
+### Bug Fixes
+
+* add must_use attribute to config/extractor functions ([d3d4d04](https://github.com/rixlhq/snowid-rust/commit/d3d4d04bdd0a69ef9cd7a049f4551c76661a7969))
+* apply subagent clippy fixes for pattern_type_mismatch and const fn ([a713f54](https://github.com/rixlhq/snowid-rust/commit/a713f54f9bc3858e0dd6def74a5e35bdc3b34cdd))
+* apply use_self and wildcard_enum_match_arm lints ([25449a4](https://github.com/rixlhq/snowid-rust/commit/25449a4a4132ed91fdfc0c4556fdcc4c3b3dd1a0))
+* avoid sleeping after failed CAS on new millisecond claim in slow path ([6665fd8](https://github.com/rixlhq/snowid-rust/commit/6665fd822e5a4e4f0bcf67b2391cd4143e688c82))
+* inline format args in SnowIDError display ([b93921d](https://github.com/rixlhq/snowid-rust/commit/b93921d9fd79f8e0ca722f0e17d73b752ea75a50))
+* mark pure config/extractor functions as const ([ba24e36](https://github.com/rixlhq/snowid-rust/commit/ba24e36d6de9ee43629ab12f8524b6421e8299fc))
+* resolve clippy warnings in base62.rs and time.rs ([a84533b](https://github.com/rixlhq/snowid-rust/commit/a84533b06c40e695f3caedfcc79e9d12e0a8ba8e))
+* resolve clippy warnings in config/mod.rs ([a237705](https://github.com/rixlhq/snowid-rust/commit/a237705fb19b075169dfebb72567f46afeae9535))
+* retry immediately on same-millisecond CAS contention in slow path ([b6e07ae](https://github.com/rixlhq/snowid-rust/commit/b6e07aee84bea9c333546b9a00c785cae5765d62))
+
+
+### Performance Improvements
+
+* **generator:** minimize nesting and resolve all remaining Clippy warnings across tests and examples ([833382c](https://github.com/rixlhq/snowid-rust/commit/833382c4dbe6e01b0691c80346a41b2862c891f0))
+* **generator:** revert to compare_exchange_weak and optimize CAS sequence increment ([40424dd](https://github.com/rixlhq/snowid-rust/commit/40424dd6914da42d9ee1d16e5d687a0e0461d4de))
+
 ## [2.0.3](https://github.com/qeeqez/snowid-rust/compare/v2.0.2...v2.0.3) (2026-03-31)
 
 
