@@ -69,11 +69,7 @@ mod tests {
 
             // Base62 encoded snowids should be relatively short
             // For a 64-bit integer, the max length in base62 is 11 characters
-            assert!(
-                id.len() <= 11,
-                "Base62 ID length should be <= 11, got {}",
-                id.len()
-            );
+            assert!(id.len() <= 11, "Base62 ID length should be <= 11, got {}", id.len());
 
             // Ensure we can decode it back
             let decoded = generator.decode_base62(&id).unwrap();

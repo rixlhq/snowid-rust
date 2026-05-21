@@ -35,14 +35,8 @@ mod tests {
         // Generate and verify components
         let snowid = generator.generate();
 
-        assert!(
-            generator.extract.node(snowid) <= 4095,
-            "Node ID exceeds maximum"
-        );
-        assert!(
-            generator.extract.sequence(snowid) <= 1023,
-            "Sequence exceeds maximum"
-        );
+        assert!(generator.extract.node(snowid) <= 4095, "Node ID exceeds maximum");
+        assert!(generator.extract.sequence(snowid) <= 1023, "Sequence exceeds maximum");
     }
 
     #[test]

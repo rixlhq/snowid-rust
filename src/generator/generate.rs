@@ -55,12 +55,7 @@ impl SnowID {
     #[inline(always)]
     pub(crate) fn cas_state(&self, expected: State, new: State) -> bool {
         self.state
-            .compare_exchange_weak(
-                expected.raw(),
-                new.raw(),
-                Ordering::AcqRel,
-                Ordering::Acquire,
-            )
+            .compare_exchange_weak(expected.raw(), new.raw(), Ordering::AcqRel, Ordering::Acquire)
             .is_ok()
     }
 

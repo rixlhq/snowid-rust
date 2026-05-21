@@ -25,14 +25,6 @@ fn main() {
     println!("\nGenerated ID: {id}");
     println!("Components:");
     println!("  Timestamp: {ts} ms since epoch");
-    println!(
-        "  Node ID: {} (of {})",
-        node,
-        generator.config.max_node_id()
-    );
-    println!(
-        "  Sequence: {} (of {})",
-        seq,
-        generator.config.max_sequence_id()
-    );
+    println!("  Node ID: {} (of {})", node, generator.config.max_node_id());
+    println!("  Sequence: {} (of {})", seq, generator.config.max_sequence_id());
 }

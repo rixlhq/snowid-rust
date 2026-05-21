@@ -67,11 +67,7 @@ fn main() {
     // Print ID examples
     println!("\nID Examples:");
     println!("------------");
-    println!(
-        "Int64:  {} ({} digits)",
-        int_ids[0],
-        int_ids[0].to_string().len()
-    );
+    println!("Int64:  {} ({} digits)", int_ids[0], int_ids[0].to_string().len());
     println!("Base62: {} ({} chars)", base62_ids[0], base62_ids[0].len());
 }
 

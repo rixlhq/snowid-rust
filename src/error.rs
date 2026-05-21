@@ -12,11 +12,7 @@ impl fmt::Display for SnowIDError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Self::InvalidNodeId { node_id, max } => {
-                write!(
-                    f,
-                    "Node ID {} is invalid. Maximum allowed value is {}",
-                    node_id, max
-                )
+                write!(f, "Node ID {} is invalid. Maximum allowed value is {}", node_id, max)
             },
         }
     }
