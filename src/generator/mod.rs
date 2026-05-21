@@ -24,7 +24,6 @@ use wait::{sleep_until_next_ms, spin_wait};
 /// Main ID generator with cache-line alignment
 #[derive(Debug)]
 #[repr(align(64))]
-#[allow(clippy::large_stack_frames)]
 pub struct SnowID {
     // === Hot path fields ===
     pub(crate) state: AtomicU64,
