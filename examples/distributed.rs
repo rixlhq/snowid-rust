@@ -1,4 +1,4 @@
-#![allow(clippy::unwrap_used, clippy::panic, clippy::print_stdout, clippy::print_stderr, clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
+#![allow(clippy::unwrap_used, clippy::panic, clippy::print_stdout, clippy::print_stderr, clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_possible_wrap, clippy::excessive_nesting)]
 use rand::{RngExt, rng};
 use snowid::SnowID;
 use std::collections::HashSet;

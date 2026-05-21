@@ -34,11 +34,8 @@ impl SnowID {
             }
         } else {
             let seq = current.sequence();
-            if seq < self.max_seq {
-                let new_state = State::from_raw(current.raw() + 1);
-                if self.cas_state(current, new_state) {
-                    return Some(self.assemble_id(ts, seq + 1));
-                }
+            if seq < self.max_seq && self.cas_state(current, State::from_raw(current.raw() + 1)) {
+                return Some(self.assemble_id(ts, seq + 1));
             }
         }
         None

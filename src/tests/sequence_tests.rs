@@ -43,14 +43,12 @@ mod tests {
             let id = generator.generate();
             let (ts, _, seq) = generator.extract.decompose(id);
 
-            if ts == last_ts && last_ts > 0 {
-                if seq >= generator.config.max_sequence_id() {
-                    let next = generator.generate();
-                    let (next_ts, _, next_seq) = generator.extract.decompose(next);
-                    assert!(next_ts > ts, "Timestamp should advance on overflow");
-                    assert_eq!(next_seq, 0, "Sequence should reset");
-                    return;
-                }
+            if ts == last_ts && last_ts > 0 && seq >= generator.config.max_sequence_id() {
+                let next = generator.generate();
+                let (next_ts, _, next_seq) = generator.extract.decompose(next);
+                assert!(next_ts > ts, "Timestamp should advance on overflow");
+                assert_eq!(next_seq, 0, "Sequence should reset");
+                return;
             }
 
             last_ts = ts;
@@ -79,6 +77,6 @@ mod tests {
 
         // Analyze timestamp distribution
         let timestamps: HashSet<_> = ids.iter().map(|id| generator.extract.timestamp(*id)).collect();
-        assert!(timestamps.len() >= 1, "Should have at least one timestamp");
+        assert!(!timestamps.is_empty(), "Should have at least one timestamp");
     }
 }
