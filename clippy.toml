@@ -39,18 +39,6 @@ type-complexity-threshold = 200
 # Minimum digits before suggesting underscore separators
 literal-representation-threshold = 16
 
-# === Naming Conventions ===
-
-# Disallow generic placeholder names that AI models love to generate
-disallowed-names = [
-    "foo", "bar", "baz", "quux",
-    "tmp", "temp",
-    "data", "result", "output", "input",
-    "val", "value",
-    "item", "elem", "thing",
-    "stuff", "misc",
-]
-
 # === Trait Bounds ===
 
 # Maximum number of trait bounds on a single type (prevents AI trait bound explosion)
