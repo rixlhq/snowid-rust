@@ -73,6 +73,14 @@ impl SnowID {
                 return id;
             }
 
+            // If time already advanced past current timestamp but CAS failed
+            // (contention on new millisecond claim), retry immediately instead
+            // of sleeping. Only sleep when stuck on the same millisecond
+            // (sequence exhaustion).
+            if now > timestamp {
+                continue;
+            }
+
             self.wait_next_millis(timestamp, backoff_ms);
             backoff_ms = next_backoff(backoff_ms);
         }
