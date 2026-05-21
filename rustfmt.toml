@@ -18,6 +18,8 @@ merge_derives = true
 # === Compact layouts ===
 # Keep function params on one line when possible
 fn_params_layout = "Compressed"
+# Be aggressive about fitting things on one line
+use_small_heuristics = "Max"
 # Shorter arrays stay on one line
 array_width = 80
 # Struct literals stay on one line longer
