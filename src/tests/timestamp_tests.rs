@@ -21,39 +21,39 @@ mod tests {
         let ts1 = g.extract.timestamp(g.generate());
         thread::sleep(Duration::from_millis(100));
         let ts2 = g.extract.timestamp(g.generate());
-
+ 
         let diff = ts2 - ts1;
-        assert!(diff >= 80 && diff <= 150, "Expected ~100ms, got {}ms", diff);
+        assert!((80..=150).contains(&diff), "Expected ~100ms, got {}ms", diff);
     }
-
+ 
     #[test]
     fn test_timestamps_across_generator_restart() {
         let g1 = SnowID::new(1).unwrap();
         let ts1 = g1.extract.timestamp(g1.generate());
         thread::sleep(Duration::from_millis(50));
-
+ 
         let g2 = SnowID::new(1).unwrap();
         let ts2 = g2.extract.timestamp(g2.generate());
-
+ 
         assert!(ts2 > ts1 && ts2 - ts1 >= 40, "Expected ~50ms diff");
     }
-
+ 
     #[test]
     fn test_timestamp_accuracy_under_load() {
         let g = SnowID::new(1).unwrap();
         let epoch = g.config.epoch();
         let mut max_drift: i64 = 0;
-
+ 
         for _ in 0..1000 {
-            let before = wall_clock_ms(epoch);
-            let ts = g.extract.timestamp(g.generate());
-            let after = wall_clock_ms(epoch);
-
+            let before = wall_clock_ms(epoch) as i64;
+            let ts = g.extract.timestamp(g.generate()) as i64;
+            let after = wall_clock_ms(epoch) as i64;
+ 
             if ts < before {
-                max_drift = max_drift.max((before - ts) as i64);
+                max_drift = max_drift.max(before - ts);
             }
             if ts > after {
-                max_drift = max_drift.max((ts - after) as i64);
+                max_drift = max_drift.max(ts - after);
             }
         }
         assert!(max_drift <= 5, "Max drift {}ms", max_drift);
