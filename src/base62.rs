@@ -4,6 +4,9 @@
 //! - `encode_array`: Returns [u8; 11] + length
 //! - `encode_into`: Writes to caller buffer
 //! - `encode`: Convenience String wrapper
+//!
+//! `unwrap()` is safe here: base62 encoding a u64 into 11 bytes is infallible, and base62 output is always valid ASCII/UTF-8.
+#![allow(clippy::unwrap_used)]
 
 use std::error::Error;
 use std::fmt;
@@ -14,7 +17,6 @@ pub const MAX_LEN: usize = 11;
 /// Zero-allocation base62 encoding to a fixed-size array
 /// Returns the array and the actual length of encoded bytes
 #[inline]
-#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible
 #[must_use]
 pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
     let mut buf = [0u8; MAX_LEN];
@@ -25,7 +27,6 @@ pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
 /// Zero-allocation base62 encoding into caller-provided buffer
 /// Returns a str slice of the encoded portion
 #[inline]
-#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible; ASCII is valid UTF-8
 pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
     let len = base62::encode_bytes(id, buf).unwrap();
     // base62 output is always valid ASCII
@@ -35,7 +36,6 @@ pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
 /// Base62 encode with String allocation (convenience wrapper)
 /// For hot paths, prefer `encode_array` or `encode_into`
 #[inline]
-#[allow(clippy::unwrap_used)] // base62 encoding a u64 into 11 bytes is infallible; ASCII is valid UTF-8
 #[must_use]
 pub fn encode(id: u64) -> String {
     let (buf, len) = encode_array(id);
