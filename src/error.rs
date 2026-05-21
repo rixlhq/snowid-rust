@@ -11,7 +11,7 @@ pub enum SnowIDError {
 impl fmt::Display for SnowIDError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            SnowIDError::InvalidNodeId { node_id, max } => {
+            Self::InvalidNodeId { node_id, max } => {
                 write!(
                     f,
                     "Node ID {} is invalid. Maximum allowed value is {}",

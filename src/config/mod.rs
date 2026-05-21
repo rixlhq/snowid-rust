@@ -23,7 +23,7 @@ pub enum SnowIDConfigError {
 impl fmt::Display for SnowIDConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            SnowIDConfigError::InvalidNodeBits { bits } => {
+            Self::InvalidNodeBits { bits } => {
                 write!(f, "Node bits {} must be between 6 and 16", bits)
             },
         }
@@ -76,6 +76,7 @@ impl SnowIDConfig {
 
     /// Create config from builder
     #[allow(clippy::missing_const_for_fn)] // uses let mut, cannot be const
+    #[allow(clippy::needless_pass_by_value)] // builder is consumed, fields are moved into Self
     pub(crate) fn from_builder(b: SnowIDConfigBuilder) -> Self {
         let mut cfg = Self::new(b.node_bits, b.custom_epoch);
         cfg.spin_enabled = b.spin_enabled;

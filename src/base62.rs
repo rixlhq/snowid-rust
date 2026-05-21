@@ -80,14 +80,14 @@ impl Error for DecodeError {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match *self {
             Self::Other(ref e) => Some(e),
-            _ => None,
+            Self::InvalidCharacter | Self::Overflow => None,
         }
     }
 }
 
 impl From<base62::DecodeError> for DecodeError {
     fn from(err: base62::DecodeError) -> Self {
-        DecodeError::Other(err)
+        Self::Other(err)
     }
 }
 
