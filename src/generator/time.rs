@@ -1,14 +1,15 @@
 //! Time utilities for SnowID generation
 //!
 //! Provides wall-clock time in milliseconds since custom epoch
+//!
+//! `expect()` and `as u64` casts are safe: SystemTime before Unix epoch is impossible on real systems.
+#![allow(clippy::expect_used, clippy::cast_possible_truncation)]
 
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Get current wall-clock time in milliseconds since Unix epoch
 #[inline(always)]
 #[must_use]
-#[allow(clippy::expect_used)] // System time before Unix epoch is impossible on real systems
-#[allow(clippy::cast_possible_truncation)] // as_millis() returns u128; truncating to u64 is safe for timestamps
 pub fn unix_time_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).expect("System time before Unix epoch").as_millis() as u64
 }

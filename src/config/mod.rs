@@ -1,4 +1,7 @@
 //! Configuration for SnowID generator
+//!
+//! `cast_possible_truncation` is safe: bits is 6-16, max value 65535 fits in u16.
+#![allow(clippy::cast_possible_truncation)]
 
 mod builder;
 
@@ -48,7 +51,6 @@ pub struct SnowIDConfig {
 
 impl SnowIDConfig {
     /// Calculate mask for given number of bits
-    #[allow(clippy::cast_possible_truncation)] // bits is 6-16, max value 65535 fits in u16
     pub(crate) const fn calculate_mask(bits: u8) -> u16 {
         ((1u32 << bits) - 1) as u16
     }

@@ -1,3 +1,6 @@
+//! `cast_possible_truncation` is safe: masks guarantee values fit in u16.
+#![allow(clippy::cast_possible_truncation)]
+
 use crate::config::SnowIDConfig;
 
 /// SnowID component extractor
@@ -22,7 +25,6 @@ impl SnowIDExtractor {
     /// Extract node component from a SnowID
     #[inline(always)]
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
     pub fn node(&self, id: u64) -> u16 {
         ((id >> self.config.node_shift()) & u64::from(self.config.node_mask())) as u16
     }
@@ -30,7 +32,6 @@ impl SnowIDExtractor {
     /// Extract sequence component from a SnowID
     #[inline(always)]
     #[must_use]
-    #[allow(clippy::cast_possible_truncation)]
     pub fn sequence(&self, id: u64) -> u16 {
         (id & u64::from(self.config.sequence_mask())) as u16
     }
