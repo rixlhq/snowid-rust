@@ -71,11 +71,9 @@ impl SnowID {
                 return id;
             }
 
-            // If time already advanced past current timestamp but CAS failed
-            // (contention on new millisecond claim), retry immediately instead
-            // of sleeping. Only sleep when stuck on the same millisecond
-            // (sequence exhaustion).
-            if now > timestamp {
+            // Retry immediately on CAS contention; only wait when the loaded
+            // state shows the current millisecond is actually exhausted.
+            if now > timestamp || current.sequence() < self.max_seq {
                 continue;
             }
 
