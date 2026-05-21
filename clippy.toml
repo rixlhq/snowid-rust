@@ -1,4 +1,6 @@
 # Clippy configuration for snowid-rust
+# Thresholds and boolean flags for clippy lints.
+# Lint levels (warn/deny) are in Cargo.toml [lints] table.
 # Enforces code quality rules similar to our JS/TS (oxlint) and Go (golangci-lint) setups
 
 # === Complexity Limits ===
