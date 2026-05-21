@@ -14,7 +14,6 @@ max-trait-bounds = 4
 enum-variant-name-threshold = 3
 
 warn-on-all-wildcard-imports = true
-msrv = "1.90.0"
 avoid-breaking-exported-api = false
 too-large-for-stack = 4096
 accept-comment-above-attributes = true
