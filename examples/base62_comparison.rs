@@ -39,17 +39,9 @@ fn main() {
     // Print results
     println!("Performance Results:");
     println!("--------------------");
-    println!(
-        "Int64 Generation:         {:?} ({:.2} ns/op)",
-        int_duration,
-        duration_to_ns(int_duration) / iterations as f64
-    );
+    println!("Int64 Generation:         {:?} ({:.2} ns/op)", int_duration, duration_to_ns(int_duration) / iterations as f64);
 
-    println!(
-        "Base62 Generation:        {:?} ({:.2} ns/op)",
-        base62_duration,
-        duration_to_ns(base62_duration) / iterations as f64
-    );
+    println!("Base62 Generation:        {:?} ({:.2} ns/op)", base62_duration, duration_to_ns(base62_duration) / iterations as f64);
 
     println!(
         "Int64 + Manual Base62:    {:?} ({:.2} ns/op)",

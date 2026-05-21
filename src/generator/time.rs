@@ -10,10 +10,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 #[allow(clippy::expect_used)] // System time before Unix epoch is impossible on real systems
 #[allow(clippy::cast_possible_truncation)] // as_millis() returns u128; truncating to u64 is safe for timestamps
 pub fn unix_time_ms() -> u64 {
-    SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .expect("System time before Unix epoch")
-        .as_millis() as u64
+    SystemTime::now().duration_since(UNIX_EPOCH).expect("System time before Unix epoch").as_millis() as u64
 }
 
 /// Get current time in milliseconds since custom epoch

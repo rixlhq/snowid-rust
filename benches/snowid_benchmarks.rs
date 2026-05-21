@@ -15,15 +15,12 @@ pub fn node_bits_comparison(c: &mut Criterion) {
         let sequence_bits = 22 - node_bits; // Total bits for node+sequence is fixed at 22
         let max_sequence = 2u32.pow(sequence_bits as u32);
 
-        group.bench_function(
-            format!("bits_{node_bits}_nodes_{max_nodes}_seq_{max_sequence}"),
-            |b| {
-                let generator = SnowID::with_config(1, config).unwrap();
-                b.iter(|| {
-                    black_box(generator.generate());
-                });
-            },
-        );
+        group.bench_function(format!("bits_{node_bits}_nodes_{max_nodes}_seq_{max_sequence}"), |b| {
+            let generator = SnowID::with_config(1, config).unwrap();
+            b.iter(|| {
+                black_box(generator.generate());
+            });
+        });
     }
 
     group.finish();

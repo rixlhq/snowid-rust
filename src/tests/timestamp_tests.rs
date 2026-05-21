@@ -2,9 +2,7 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::tests::test_utils::{
-        assert_ids_monotonic, assert_timestamp_accurate, assert_unique_ids, wall_clock_ms,
-    };
+    use crate::tests::test_utils::{assert_ids_monotonic, assert_timestamp_accurate, assert_unique_ids, wall_clock_ms};
     use crate::*;
     use std::collections::HashSet;
     use std::thread;

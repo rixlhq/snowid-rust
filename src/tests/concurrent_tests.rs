@@ -50,13 +50,7 @@ mod tests {
         }
 
         // Verify expected number of unique IDs
-        assert_eq!(
-            ids.len(),
-            iterations,
-            "Expected {} unique IDs, but got {}",
-            iterations,
-            ids.len()
-        );
+        assert_eq!(ids.len(), iterations, "Expected {} unique IDs, but got {}", iterations, ids.len());
     }
 
     #[test]

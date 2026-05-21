@@ -52,20 +52,12 @@ mod tests {
 
     #[test]
     fn test_spin_tuning_builder() {
-        let cfg = SnowIDConfig::builder()
-            .enable_spin(false)
-            .spin_loops(0)
-            .spin_yield_every(0)
-            .build();
+        let cfg = SnowIDConfig::builder().enable_spin(false).spin_loops(0).spin_yield_every(0).build();
         assert!(!cfg.spin_enabled());
         assert_eq!(cfg.spin_loops(), 0);
         assert_eq!(cfg.spin_yield_every(), 0);
 
-        let cfg2 = SnowIDConfig::builder()
-            .enable_spin(true)
-            .spin_loops(128)
-            .spin_yield_every(8)
-            .build();
+        let cfg2 = SnowIDConfig::builder().enable_spin(true).spin_loops(128).spin_yield_every(8).build();
         assert!(cfg2.spin_enabled());
         assert_eq!(cfg2.spin_loops(), 128);
         assert_eq!(cfg2.spin_yield_every(), 8);
