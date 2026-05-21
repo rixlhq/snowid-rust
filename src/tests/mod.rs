@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used, clippy::panic)]
 mod base62_tests;
 mod boundary_tests;
 mod concurrent_tests;

@@ -1,3 +1,4 @@
+#![allow(clippy::unwrap_used, clippy::panic, clippy::print_stdout, clippy::print_stderr, clippy::cast_precision_loss, clippy::cast_possible_truncation, clippy::cast_possible_wrap)]
 use snowid::{SnowID, SnowIDConfig};
 
 fn main() {
