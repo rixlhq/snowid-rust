@@ -54,6 +54,11 @@ enum-variant-name-threshold = 3
 # Warn on wildcard imports (AI loves `use foo::*`)
 warn-on-all-wildcard-imports = true
 
+# === Minimum Supported Rust Version ===
+# Clippy uses this to gate lints that require newer language features.
+# Should match the `rust-version` field in Cargo.toml.
+msrv = "1.90.0"
+
 # === Test Organization ===
 
 # Allow unwrap/expect in tests (test code has different standards)
