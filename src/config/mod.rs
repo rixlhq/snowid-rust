@@ -33,7 +33,6 @@ impl Error for SnowIDConfigError {}
 /// Copy-optimized with const-evaluable fields
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
-#[allow(clippy::large_stack_frames)]
 pub struct SnowIDConfig {
     node_bits: u8,
     custom_epoch: u64,

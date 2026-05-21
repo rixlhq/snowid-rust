@@ -68,7 +68,6 @@
     clippy::too_many_lines,
     clippy::excessive_nesting,
     clippy::large_enum_variant,
-    clippy::large_stack_frames,
     clippy::type_repetition_in_bounds,
     clippy::verbose_bit_mask,
     clippy::branches_sharing_code
