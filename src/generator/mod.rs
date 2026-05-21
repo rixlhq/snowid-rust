@@ -78,7 +78,6 @@ impl SnowID {
     }
 
     #[inline(always)]
-    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
     const fn compute_node_prefix(node_id: u16, config: &SnowIDConfig) -> u64 {
         (node_id as u64) << config.node_shift()
     }
@@ -102,7 +101,6 @@ impl SnowID {
     }
 
     #[inline(always)]
-    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
     pub(crate) const fn assemble_id(&self, timestamp: u64, sequence: u16) -> u64 {
         ((timestamp & self.ts_mask) << self.ts_shift) | self.node_prefix | (sequence as u64)
     }
@@ -110,7 +108,6 @@ impl SnowID {
     #[inline(always)]
     #[allow(dead_code)] // Used in extractor.rs tests
     #[allow(clippy::too_many_arguments)]
-    #[allow(clippy::cast_lossless)] // u64::from is not const-stable in Rust 1.95
     pub(crate) const fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
         ((ts & self.config.timestamp_mask()) << self.config.timestamp_shift()) | ((node as u64) << self.config.node_shift()) | (seq as u64)
     }
