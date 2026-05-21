@@ -25,7 +25,7 @@ impl fmt::Display for SnowIDConfigError {
         match *self {
             SnowIDConfigError::InvalidNodeBits { bits } => {
                 write!(f, "Node bits {} must be between 6 and 16", bits)
-            }
+            },
         }
     }
 }
