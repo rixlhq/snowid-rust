@@ -6,6 +6,8 @@ use std::fmt;
 pub enum SnowIDError {
     /// Error when node ID exceeds the maximum allowed value
     InvalidNodeId { node_id: u16, max: u16 },
+    /// Error when epoch is outside the timestamp range representable by SnowID
+    InvalidEpoch { epoch: u64, now: u64, max_age_ms: u64 },
 }
 
 impl fmt::Display for SnowIDError {
@@ -13,6 +15,12 @@ impl fmt::Display for SnowIDError {
         match *self {
             Self::InvalidNodeId { node_id, max } => {
                 write!(f, "Node ID {node_id} is invalid. Maximum allowed value is {max}")
+            },
+            Self::InvalidEpoch { epoch, now, max_age_ms } => {
+                write!(
+                    f,
+                    "Epoch {epoch} is invalid for current time {now}. Epoch must not be in the future or more than {max_age_ms}ms old"
+                )
             },
         }
     }
@@ -41,5 +49,11 @@ mod tests {
         let original = SnowIDError::InvalidNodeId { node_id: 1024, max: 1023 };
         let cloned = original.clone();
         assert_eq!(original, cloned);
+    }
+
+    #[test]
+    fn test_invalid_epoch_display() {
+        let invalid_epoch = SnowIDError::InvalidEpoch { epoch: 200, now: 100, max_age_ms: 10 };
+        assert!(invalid_epoch.to_string().contains("Epoch 200 is invalid"));
     }
 }
