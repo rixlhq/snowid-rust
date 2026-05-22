@@ -20,6 +20,11 @@ fn generate_batch(generator: &SnowID, iterations: usize) -> u64 {
     last
 }
 
+fn reserve_batch(generator: &SnowID, ids: &mut [u64]) -> u64 {
+    let written = generator.try_generate_batch(ids);
+    ids.iter().take(written).fold(written as u64, |checksum, id| checksum ^ id)
+}
+
 fn join_checksum(handles: Vec<thread::JoinHandle<u64>>) -> u64 {
     let mut checksum = 0u64;
     for handle in handles {
@@ -91,6 +96,36 @@ pub fn generation_burst_capacity(c: &mut Criterion) {
             let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let generator = SnowID::with_config(1, config).unwrap();
             b.iter(|| black_box(generate_batch(&generator, 1024)));
+        });
+    }
+
+    group.finish();
+}
+
+pub fn batch_reservation(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Hotspot Batch Reservation");
+
+    for batch in [64usize, 256, 1024] {
+        group.bench_function(format!("try_generate_batch/{batch}"), |b| {
+            b.iter_batched(
+                || {
+                    let config = SnowIDConfig::builder().node_bits(6).unwrap().build();
+                    (SnowID::with_config(1, config).unwrap(), vec![0u64; batch])
+                },
+                |(generator, mut ids)| black_box(reserve_batch(&generator, black_box(&mut ids))),
+                BatchSize::SmallInput,
+            );
+        });
+
+        group.bench_function(format!("generate_loop/{batch}"), |b| {
+            b.iter_batched(
+                || {
+                    let config = SnowIDConfig::builder().node_bits(6).unwrap().build();
+                    SnowID::with_config(1, config).unwrap()
+                },
+                |generator| black_box(generate_batch(&generator, batch)),
+                BatchSize::SmallInput,
+            );
         });
     }
 
@@ -227,6 +262,7 @@ criterion_group! {
         time_source_cost,
         generation_by_capacity,
         generation_burst_capacity,
+        batch_reservation,
         generator_creation,
         shared_generator_contention,
         per_thread_generator,
