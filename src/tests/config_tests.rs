@@ -40,7 +40,6 @@ mod tests {
         let config = SnowIDConfig::default();
         assert_eq!(config.node_bits(), 10);
         assert_eq!(config.sequence_bits(), 12);
-        assert!(config.spin_enabled());
     }
 
     #[test]
@@ -48,18 +47,5 @@ mod tests {
         let config = SnowIDConfig::default();
         assert_eq!(config.max_sequence_id(), 0xFFF);
         assert_eq!(config.max_node_id(), 0x3FF);
-    }
-
-    #[test]
-    fn test_spin_tuning_builder() {
-        let cfg = SnowIDConfig::builder().enable_spin(false).spin_loops(0).spin_yield_every(0).build();
-        assert!(!cfg.spin_enabled());
-        assert_eq!(cfg.spin_loops(), 0);
-        assert_eq!(cfg.spin_yield_every(), 0);
-
-        let cfg2 = SnowIDConfig::builder().enable_spin(true).spin_loops(128).spin_yield_every(8).build();
-        assert!(cfg2.spin_enabled());
-        assert_eq!(cfg2.spin_loops(), 128);
-        assert_eq!(cfg2.spin_yield_every(), 8);
     }
 }

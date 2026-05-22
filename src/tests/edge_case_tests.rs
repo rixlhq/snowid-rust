@@ -187,7 +187,7 @@ mod tests {
         assert!(id2 > id1);
         // Note: Base62 string comparison != numeric comparison
         // but decoded values should maintain order
-        assert!(base62_decode(&s2).unwrap() > base62_decode(&s1).unwrap());
+        assert!(base62::decode(&s2).unwrap() > base62::decode(&s1).unwrap());
     }
 
     /// Test ID decomposition round-trip

@@ -7,7 +7,7 @@ mod tests {
     proptest! {
         #[test]
         fn generate_batch_preserves_uniqueness_and_layout(node_bits in 6u8..=16, batch_len in 1usize..=8192) {
-            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().enable_spin(false).build();
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let generator = SnowID::with_config(1, config).unwrap();
             let mut ids = vec![0u64; batch_len];
 
@@ -25,7 +25,7 @@ mod tests {
 
         #[test]
         fn generate_is_monotonic_under_varied_capacity(node_bits in 6u8..=16, count in 1usize..=20_000) {
-            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().enable_spin(false).build();
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let generator = SnowID::with_config(1, config).unwrap();
             let ids: Vec<u64> = (0..count).map(|_| generator.generate()).collect();
 
@@ -35,7 +35,7 @@ mod tests {
 
         #[test]
         fn try_generate_batch_never_exceeds_requested_or_capacity(node_bits in 6u8..=16, batch_len in 1usize..=131_072) {
-            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().enable_spin(false).build();
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let generator = SnowID::with_config(1, config).unwrap();
             let mut ids = vec![0u64; batch_len];
 

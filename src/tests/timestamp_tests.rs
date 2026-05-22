@@ -141,7 +141,7 @@ mod tests {
 
     #[test]
     fn test_logical_future_timestamp_resyncs_after_wall_clock_catches_up() {
-        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let g = SnowID::with_config(1, cfg).unwrap();
         let mut ids = [0u64; 128];
         g.generate_batch(&mut ids);
@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn test_try_generate_recovers_after_wall_clock_catches_logical_future() {
-        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let g = SnowID::with_config(1, cfg).unwrap();
         let mut ids = [0u64; 128];
         g.generate_batch(&mut ids);
