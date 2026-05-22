@@ -40,7 +40,7 @@ impl SnowIDConfigBuilder {
 
     /// Build the final SnowIDConfig
     pub fn build(self) -> SnowIDConfig {
-        SnowIDConfig::from_builder(self)
+        SnowIDConfig::new(self.node_bits, self.custom_epoch)
     }
 }
 

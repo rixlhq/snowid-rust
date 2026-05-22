@@ -141,7 +141,15 @@ impl SnowID {
     #[inline(always)]
     fn try_reserve_batch(&self, now: u64, current: State, out: &mut [u64]) -> Option<usize> {
         let ts = current.timestamp();
-        let start_seq = Self::next_nonblocking_sequence(now, current, self.max_seq)?;
+        let start_seq = if now > ts {
+            0
+        } else {
+            let seq = current.sequence();
+            if seq >= self.max_seq {
+                return None;
+            }
+            seq + 1
+        };
 
         let remaining = self.max_seq - start_seq;
         let requested = u16::try_from(out.len().saturating_sub(1)).unwrap_or(u16::MAX);
@@ -166,7 +174,12 @@ impl SnowID {
         let ts = current.timestamp();
         let base_ts = now.max(ts);
         let capacity = usize::from(self.max_seq) + 1;
-        let start = self.next_logical_sequence_index(base_ts, current);
+        let start = if base_ts > ts {
+            0
+        } else {
+            let seq = current.sequence();
+            if seq < self.max_seq { usize::from(seq) + 1 } else { usize::from(self.max_seq) + 1 }
+        };
         let final_index = start + out.len() - 1;
         let final_ts = base_ts.saturating_add((final_index / capacity) as u64);
         let final_seq = u16::try_from(final_index % capacity).unwrap_or(self.max_seq);
@@ -177,24 +190,6 @@ impl SnowID {
 
         self.fill_logical_batch(out, LogicalBatchStart { base_ts, start, capacity });
         true
-    }
-
-    #[inline(always)]
-    fn next_nonblocking_sequence(now: u64, current: State, max_seq: u16) -> Option<u16> {
-        if now > current.timestamp() {
-            return Some(0);
-        }
-        let seq = current.sequence();
-        (seq < max_seq).then(|| seq + 1)
-    }
-
-    #[inline(always)]
-    fn next_logical_sequence_index(&self, base_ts: u64, current: State) -> usize {
-        if base_ts > current.timestamp() {
-            return 0;
-        }
-        let seq = current.sequence();
-        if seq < self.max_seq { usize::from(seq) + 1 } else { usize::from(self.max_seq) + 1 }
     }
 
     #[inline]
