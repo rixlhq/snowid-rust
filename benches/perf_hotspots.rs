@@ -20,9 +20,22 @@ fn generate_batch(generator: &SnowID, iterations: usize) -> u64 {
     last
 }
 
+fn generate_unbounded_batch(generator: &SnowID, iterations: usize) -> u64 {
+    let mut last = 0u64;
+    for _ in 0..iterations {
+        last = generator.generate_unbounded();
+    }
+    last
+}
+
 fn reserve_batch(generator: &SnowID, ids: &mut [u64]) -> u64 {
     let written = generator.try_generate_batch(ids);
     ids.iter().take(written).fold(written as u64, |checksum, id| checksum ^ id)
+}
+
+fn fill_batch(generator: &SnowID, ids: &mut [u64]) -> u64 {
+    generator.generate_batch(ids);
+    ids.iter().fold(ids.len() as u64, |checksum, id| checksum ^ id)
 }
 
 fn join_checksum(handles: Vec<thread::JoinHandle<u64>>) -> u64 {
@@ -102,6 +115,26 @@ pub fn generation_burst_capacity(c: &mut Criterion) {
     group.finish();
 }
 
+pub fn unbounded_generation(c: &mut Criterion) {
+    let mut group = c.benchmark_group("Hotspot Unbounded Generation");
+
+    for node_bits in [10, 16] {
+        group.bench_function(format!("generate_unbounded/node_bits/{node_bits}/batch/1024"), |b| {
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
+            let generator = SnowID::with_config(1, config).unwrap();
+            b.iter(|| black_box(generate_unbounded_batch(&generator, 1024)));
+        });
+
+        group.bench_function(format!("generate_strict/node_bits/{node_bits}/batch/1024"), |b| {
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
+            let generator = SnowID::with_config(1, config).unwrap();
+            b.iter(|| black_box(generate_batch(&generator, 1024)));
+        });
+    }
+
+    group.finish();
+}
+
 pub fn batch_reservation(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Batch Reservation");
 
@@ -113,6 +146,17 @@ pub fn batch_reservation(c: &mut Criterion) {
                     (SnowID::with_config(1, config).unwrap(), vec![0u64; batch])
                 },
                 |(generator, mut ids)| black_box(reserve_batch(&generator, black_box(&mut ids))),
+                BatchSize::SmallInput,
+            );
+        });
+
+        group.bench_function(format!("generate_batch/{batch}"), |b| {
+            b.iter_batched(
+                || {
+                    let config = SnowIDConfig::builder().node_bits(6).unwrap().build();
+                    (SnowID::with_config(1, config).unwrap(), vec![0u64; batch])
+                },
+                |(generator, mut ids)| black_box(fill_batch(&generator, black_box(&mut ids))),
                 BatchSize::SmallInput,
             );
         });
@@ -262,6 +306,7 @@ criterion_group! {
         time_source_cost,
         generation_by_capacity,
         generation_burst_capacity,
+        unbounded_generation,
         batch_reservation,
         generator_creation,
         shared_generator_contention,
