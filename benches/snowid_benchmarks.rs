@@ -45,7 +45,6 @@ pub fn overflow_stress_single_thread(c: &mut Criterion) {
             b.iter_batched(
                 || (),
                 |_| {
-                    // Generate a batch of IDs as fast as possible to trigger overflow waits
                     let mut last = 0u64;
                     for _ in 0..batch {
                         last = generator.generate();
