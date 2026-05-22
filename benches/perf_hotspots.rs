@@ -6,7 +6,7 @@ use std::thread;
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 use criterion::{BatchSize, Criterion, criterion_group, criterion_main};
-use snowid::{BASE62_MAX_LEN, SnowID, SnowIDConfig};
+use snowid::{SnowID, SnowIDConfig, base62};
 
 fn criterion_config() -> Criterion {
     Criterion::default().sample_size(20).measurement_time(Duration::from_secs(2))
@@ -16,14 +16,6 @@ fn generate_batch(generator: &SnowID, iterations: usize) -> u64 {
     let mut last = 0u64;
     for _ in 0..iterations {
         last = generator.generate();
-    }
-    last
-}
-
-fn generate_strict_batch(generator: &SnowID, iterations: usize) -> u64 {
-    let mut last = 0u64;
-    for _ in 0..iterations {
-        last = generator.generate_strict();
     }
     last
 }
@@ -132,12 +124,6 @@ pub fn unbounded_generation(c: &mut Criterion) {
             let generator = SnowID::with_config(1, config).unwrap();
             b.iter(|| black_box(generate_unbounded_batch(&generator, 1024)));
         });
-
-        group.bench_function(format!("generate_strict/node_bits/{node_bits}/batch/1024"), |b| {
-            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
-            let generator = SnowID::with_config(1, config).unwrap();
-            b.iter(|| black_box(generate_strict_batch(&generator, 1024)));
-        });
     }
 
     group.finish();
@@ -227,32 +213,6 @@ pub fn per_thread_generator(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn overflow_spin_policy(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Hotspot Overflow Spin Policy");
-
-    for (label, spin_enabled, spin_loops, yield_every) in [
-        ("spin_off", false, 0, 0),
-        ("spin_16_no_yield", true, 16, 0),
-        ("spin_64_yield_16", true, 64, 16),
-        ("spin_256_no_yield", true, 256, 0),
-    ] {
-        group.bench_function(format!("{label}/batch/256"), |b| {
-            let config = SnowIDConfig::builder()
-                .node_bits(16)
-                .unwrap()
-                .enable_spin(spin_enabled)
-                .spin_loops(spin_loops)
-                .spin_yield_every(yield_every)
-                .build();
-            let generator = SnowID::with_config(1, config).unwrap();
-
-            b.iter(|| black_box(generate_batch(&generator, 256)));
-        });
-    }
-
-    group.finish();
-}
-
 pub fn extraction_shapes(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Extraction");
     let generator = SnowID::new(1).unwrap();
@@ -290,14 +250,14 @@ pub fn base62_buffer_reuse(c: &mut Criterion) {
 
     group.bench_function("into_fresh_stack_buffer", |b| {
         b.iter(|| {
-            let mut buf = [0u8; BASE62_MAX_LEN];
+            let mut buf = [0u8; base62::MAX_LEN];
             let (_, raw) = generator.generate_base62_into(&mut buf);
             black_box(raw)
         });
     });
 
     group.bench_function("into_reused_buffer", |b| {
-        let mut buf = [0u8; BASE62_MAX_LEN];
+        let mut buf = [0u8; base62::MAX_LEN];
         b.iter(|| {
             let (_, raw) = generator.generate_base62_into(&mut buf);
             black_box(raw)
@@ -319,7 +279,6 @@ criterion_group! {
         generator_creation,
         shared_generator_contention,
         per_thread_generator,
-        overflow_spin_policy,
         extraction_shapes,
         base62_buffer_reuse
 }
