@@ -115,10 +115,10 @@ mod tests {
     }
 
     #[test]
-    fn test_generate_unbounded_advances_logical_timestamp() {
+    fn test_generate_advances_logical_timestamp() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
-        let ids: Vec<u64> = (0..128).map(|_| generator.generate_unbounded()).collect();
+        let ids: Vec<u64> = (0..128).map(|_| generator.generate()).collect();
 
         assert_unique_ids(&ids, ids.len());
         assert_ids_monotonic(&ids);
