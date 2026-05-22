@@ -32,7 +32,7 @@ shapes:
 - generated IDs are unique and monotonic
 - extracted node and sequence components stay within configured bounds
 - logical batch generation preserves ordering across rollover
-- strict batch generation never writes more IDs than requested or current wall-clock capacity allows
+- `try_generate_batch()` never writes more IDs than requested or current wall-clock capacity allows
 
 Run them with the rest of the suite:
 
