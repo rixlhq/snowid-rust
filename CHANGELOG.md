@@ -1,5 +1,37 @@
 # Changelog
 
+## [3.0.0](https://github.com/rixlhq/snowid-rust/compare/v2.1.0...v3.0.0) (2026-05-22)
+
+
+### ⚠ BREAKING CHANGES
+
+* fold logical generation into generate
+* remove legacy waiting APIs
+
+### Features
+
+* fold logical generation into generate ([16f2b97](https://github.com/rixlhq/snowid-rust/commit/16f2b97b10f9502ba695cf30295c1cc116e3068b))
+* **generator:** add logical timestamp generation ([e3427e4](https://github.com/rixlhq/snowid-rust/commit/e3427e4a1cafaed4b5dde6276cf7cd6d125dd0c6))
+* **generator:** add nonblocking batch generation ([1dcbbff](https://github.com/rixlhq/snowid-rust/commit/1dcbbffd2496734d0df540e0a740ba7a86bf6cc2))
+* **generator:** make logical generation the default ([8ce15d7](https://github.com/rixlhq/snowid-rust/commit/8ce15d783111a1ca4543d7e3899d91f2e02d907e))
+* remove legacy waiting APIs ([8a9f71e](https://github.com/rixlhq/snowid-rust/commit/8a9f71ed568f444d02b4382f9673acb40995b57c))
+
+
+### Bug Fixes
+
+* **generator:** guard epoch and strict future-state semantics ([a64c5eb](https://github.com/rixlhq/snowid-rust/commit/a64c5eb4994a4958217677bda42d9171daa2dc19))
+* **generator:** refine try API exhaustion handling ([7252ca7](https://github.com/rixlhq/snowid-rust/commit/7252ca7f5c16093a01de4865d62fd528a82bbf68))
+* **generator:** stop try APIs on future logical state ([3370766](https://github.com/rixlhq/snowid-rust/commit/3370766178227472d8d8f49663db7b6f813720ce))
+
+
+### Performance Improvements
+
+* **bench:** add focused hotspot benchmarks ([43be5a6](https://github.com/rixlhq/snowid-rust/commit/43be5a6a421b00f2649cc198239819a9b01e39a9))
+* **bench:** compare batch reservation throughput ([1993fa0](https://github.com/rixlhq/snowid-rust/commit/1993fa0760a987357734c98359ded141c60bd344))
+* **bench:** compare strict generation explicitly ([dbe515d](https://github.com/rixlhq/snowid-rust/commit/dbe515d0d968f1e1a979ec9c2a26a655f6dca178))
+* **bench:** measure logical generation modes ([cf0adee](https://github.com/rixlhq/snowid-rust/commit/cf0adeea4c3284ffb3c394c47a06ab9fd95ebbb9))
+* **bench:** remove stale overflow wait wording ([b3119ab](https://github.com/rixlhq/snowid-rust/commit/b3119abbc0bca35a2ddb0c16295990da075f7dcc))
+
 ## [2.1.0](https://github.com/rixlhq/snowid-rust/compare/v2.0.3...v2.1.0) (2026-05-21)
 
 
