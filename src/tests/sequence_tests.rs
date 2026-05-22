@@ -183,6 +183,29 @@ mod tests {
     }
 
     #[test]
+    fn test_try_generate_returns_err_when_logical_state_is_future() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 128];
+        generator.generate_batch(&mut ids);
+
+        let err = generator.try_generate().unwrap_err();
+
+        assert_eq!(err.timestamp, generator.extract.timestamp(ids[127]));
+    }
+
+    #[test]
+    fn test_try_generate_batch_returns_zero_when_logical_state_is_future() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 128];
+        let mut out = [0u64; 4];
+        generator.generate_batch(&mut ids);
+
+        assert_eq!(generator.try_generate_batch(&mut out), 0);
+    }
+
+    #[test]
     fn test_strict_generation_waits_until_logical_future_catches_up() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
         let generator = SnowID::with_config(1, config).unwrap();
