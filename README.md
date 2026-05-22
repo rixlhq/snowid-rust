@@ -193,6 +193,26 @@ Choose configuration based on your needs:
 - More IDs per node → Increase sequence bits (min 6 node bits = 64 nodes)
 - Total bits (node + sequence) is fixed at 22 bits
 
+For maximum throughput, pick the lowest `node_bits` value that still covers your deployment. More node bits reduce
+per-node sequence capacity, so burst-heavy workloads reach the overflow wait path sooner. On a local Apple Silicon
+benchmark run (`cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/<N>"`), the same generator
+measured approximately 26.5ns at `node_bits=6`, 315ns at the default `node_bits=10`, and 22.7µs at `node_bits=16`.
+Treat these numbers as machine-specific, but the trend is expected: sequence capacity is the main performance lever.
+
+Shared-generator contention is the other major throughput factor. A single shared generator is lock-free, but all
+threads still update one atomic state. In the same local benchmark run, 8 threads sharing one generator for 1,024 IDs
+each took about 2.64ms, while 8 per-thread generators took about 145µs. If your topology allows it, prefer one
+generator per thread, worker, or shard with distinct node IDs for peak throughput.
+
+Focused hotspot benchmarks are available for validating your target machine without running the full benchmark suite:
+
+```bash
+cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/10"
+cargo bench --bench perf_hotspots -- "Hotspot Shared Generator/threads/8/ops_per_thread/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Per Thread Generator/threads/8/ops_per_thread/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Overflow Spin Policy/spin_64_yield_16/batch/256"
+```
+
 ### Int64 vs Base62 Performance
 
 | Variant          | Time/ID | Size         | Notes                        |
