@@ -7,7 +7,7 @@
     clippy::cast_possible_truncation,
     clippy::cast_possible_wrap
 )]
-use snowid::{SnowID, base62_encode};
+use snowid::{SnowID, base62};
 use std::time::{Duration, Instant};
 
 fn main() {
@@ -41,7 +41,7 @@ fn main() {
     let mut manual_base62_ids = Vec::with_capacity(iterations);
     for _ in 0..iterations {
         let id = int_gen.generate();
-        manual_base62_ids.push(base62_encode(id));
+        manual_base62_ids.push(base62::encode(id));
     }
     let manual_base62_duration = start.elapsed();
 

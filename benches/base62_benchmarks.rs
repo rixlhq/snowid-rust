@@ -7,7 +7,7 @@
     clippy::cast_precision_loss
 )]
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
-use snowid::{BASE62_MAX_LEN, SnowID, base62_decode, base62_encode, base62_encode_array};
+use snowid::{SnowID, base62};
 use std::hint::black_box;
 
 // Common test values used across benchmarks
@@ -43,7 +43,7 @@ pub fn id_generation_comparison(c: &mut Criterion) {
     // Benchmark zero-allocation base62 with caller buffer
     group.bench_function("base62_generation_into", |b| {
         b.iter(|| {
-            let mut buf = [0u8; BASE62_MAX_LEN];
+            let mut buf = [0u8; base62::MAX_LEN];
             let (_, raw_id) = generator.generate_base62_into(&mut buf);
             black_box(raw_id)
         });
@@ -57,13 +57,13 @@ pub fn base62_encoding(c: &mut Criterion) {
 
     for &value in &TEST_VALUES {
         // String-allocating version
-        group.bench_with_input(BenchmarkId::new("base62_encode_string", value), &value, |b, &value| {
-            b.iter(|| black_box(base62_encode(value)));
+        group.bench_with_input(BenchmarkId::new("encode_string", value), &value, |b, &value| {
+            b.iter(|| black_box(base62::encode(value)));
         });
 
         // Zero-alloc array version
-        group.bench_with_input(BenchmarkId::new("base62_encode_array", value), &value, |b, &value| {
-            b.iter(|| black_box(base62_encode_array(value)));
+        group.bench_with_input(BenchmarkId::new("encode_array", value), &value, |b, &value| {
+            b.iter(|| black_box(base62::encode_array(value)));
         });
     }
 
@@ -75,10 +75,10 @@ pub fn base62_decoding(c: &mut Criterion) {
 
     for &value in &TEST_VALUES {
         // Pre-encode the value for decoding benchmarks
-        let encoded = base62_encode(value);
+        let encoded = base62::encode(value);
 
-        group.bench_with_input(BenchmarkId::new("base62_decode", value), &encoded, |b, encoded| {
-            b.iter(|| black_box(base62_decode(encoded).unwrap()));
+        group.bench_with_input(BenchmarkId::new("decode", value), &encoded, |b, encoded| {
+            b.iter(|| black_box(base62::decode(encoded).unwrap()));
         });
     }
 
@@ -91,8 +91,8 @@ pub fn roundtrip_benchmark(c: &mut Criterion) {
     for &value in &TEST_VALUES {
         group.bench_with_input(BenchmarkId::new("base62_roundtrip", value), &value, |b, &value| {
             b.iter(|| {
-                let encoded = base62_encode(value);
-                black_box(base62_decode(&encoded).unwrap());
+                let encoded = base62::encode(value);
+                black_box(base62::decode(&encoded).unwrap());
             });
         });
     }
