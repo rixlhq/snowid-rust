@@ -95,4 +95,56 @@ mod tests {
         // Use shared utility for uniqueness and monotonicity checks
         assert_unique_and_monotonic(all_ids, num_threads * ids_per_thread);
     }
+
+    #[test]
+    fn test_concurrent_logical_overflow_lockfree() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = Arc::new(SnowID::with_config(7, config).unwrap());
+        let num_threads = 16;
+        let ids_per_thread = 1024;
+        let mut handles = Vec::with_capacity(num_threads);
+
+        for _ in 0..num_threads {
+            let generator = Arc::clone(&generator);
+            handles.push(thread::spawn(move || {
+                let mut ids = Vec::with_capacity(ids_per_thread);
+                for _ in 0..ids_per_thread {
+                    ids.push(generator.generate());
+                }
+                ids
+            }));
+        }
+
+        let mut all_ids = Vec::with_capacity(num_threads * ids_per_thread);
+        for handle in handles {
+            all_ids.extend(handle.join().unwrap());
+        }
+
+        assert_unique_and_monotonic(all_ids, num_threads * ids_per_thread);
+    }
+
+    #[test]
+    fn test_concurrent_logical_batch_generation_lockfree() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = Arc::new(SnowID::with_config(9, config).unwrap());
+        let num_threads = 8;
+        let batch_len = 512;
+        let mut handles = Vec::with_capacity(num_threads);
+
+        for _ in 0..num_threads {
+            let generator = Arc::clone(&generator);
+            handles.push(thread::spawn(move || {
+                let mut ids = vec![0u64; batch_len];
+                generator.generate_batch(&mut ids);
+                ids
+            }));
+        }
+
+        let mut all_ids = Vec::with_capacity(num_threads * batch_len);
+        for handle in handles {
+            all_ids.extend(handle.join().unwrap());
+        }
+
+        assert_unique_and_monotonic(all_ids, num_threads * batch_len);
+    }
 }
