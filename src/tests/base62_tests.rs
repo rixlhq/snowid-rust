@@ -8,8 +8,8 @@ mod tests {
         let test_values = [0u64, 1, 62, 123, 1234567890, u64::MAX / 2, u64::MAX];
 
         for &value in &test_values {
-            let encoded = base62_encode(value);
-            let decoded = base62_decode(&encoded).unwrap();
+            let encoded = base62::encode(value);
+            let decoded = base62::decode(&encoded).unwrap();
             assert_eq!(decoded, value, "Failed roundtrip for {value}");
         }
     }
@@ -25,7 +25,7 @@ mod tests {
         let (base62_id, raw_id) = generator.generate_base62_with_raw();
 
         // Ensure the raw ID can be decoded from the string
-        let decoded_id = base62_decode(&base62_id).unwrap();
+        let decoded_id = base62::decode(&base62_id).unwrap();
         assert_eq!(decoded_id, raw_id);
 
         // Extract components from both IDs

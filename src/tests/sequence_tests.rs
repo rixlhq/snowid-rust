@@ -6,7 +6,6 @@ mod tests {
     use crate::*;
     use std::collections::HashSet;
     use std::thread;
-    use std::time::Duration;
 
     #[test]
     fn test_sequence_rollover() {
@@ -104,7 +103,7 @@ mod tests {
 
     #[test]
     fn test_try_generate_batch_returns_partial_capacity() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 128];
 
@@ -117,7 +116,7 @@ mod tests {
 
     #[test]
     fn test_generate_unbounded_advances_logical_timestamp() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let ids: Vec<u64> = (0..128).map(|_| generator.generate_unbounded()).collect();
 
@@ -129,7 +128,7 @@ mod tests {
 
     #[test]
     fn test_generate_batch_fills_full_buffer_across_logical_timestamps() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 128];
 
@@ -143,7 +142,7 @@ mod tests {
 
     #[test]
     fn test_generate_defaults_to_logical_timestamp_overflow() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let ids: Vec<u64> = (0..128).map(|_| generator.generate()).collect();
 
@@ -155,7 +154,7 @@ mod tests {
 
     #[test]
     fn test_generate_batch_handles_sustained_logical_overflow() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 4096];
 
@@ -171,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_logical_future_state_never_moves_backwards() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 4096];
         generator.generate_batch(&mut ids);
@@ -184,7 +183,7 @@ mod tests {
 
     #[test]
     fn test_try_generate_returns_err_when_logical_state_is_future() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 128];
         generator.generate_batch(&mut ids);
@@ -196,28 +195,13 @@ mod tests {
 
     #[test]
     fn test_try_generate_batch_returns_zero_when_logical_state_is_future() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
         let mut ids = [0u64; 4096];
         let mut out = [0u64; 4];
         generator.generate_batch(&mut ids);
 
         assert_eq!(generator.try_generate_batch(&mut out), 0);
-    }
-
-    #[test]
-    fn test_strict_generation_waits_until_logical_future_catches_up() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
-        let generator = SnowID::with_config(1, config).unwrap();
-        let mut ids = [0u64; 128];
-        generator.generate_batch(&mut ids);
-        let future_ts = generator.extract.timestamp(ids[127]);
-
-        thread::sleep(Duration::from_millis(3));
-        let strict = generator.generate_strict();
-
-        assert!(generator.extract.timestamp(strict) >= future_ts);
-        assert!(strict > ids[127]);
     }
 
     #[test]

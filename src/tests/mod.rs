@@ -17,4 +17,3 @@ mod property_tests;
 mod sequence_tests;
 pub mod test_utils;
 mod timestamp_tests;
-mod timing_tests;

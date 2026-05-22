@@ -10,7 +10,6 @@ mod base62_methods;
 mod generate;
 mod state;
 mod time;
-mod wait;
 
 pub use generate::TryGenerateError;
 
@@ -21,7 +20,6 @@ use crate::error::SnowIDError;
 use crate::extractor::SnowIDExtractor;
 
 use time::{time_since_epoch, unix_time_ms};
-use wait::{sleep_until_next_ms, spin_wait};
 
 /// Main ID generator with cache-line alignment
 #[derive(Debug)]
@@ -97,19 +95,6 @@ impl SnowID {
     #[inline(always)]
     pub(crate) fn now_ms(&self) -> u64 {
         time_since_epoch(self.epoch)
-    }
-
-    #[inline(always)]
-    #[allow(dead_code)] // Used in timing_tests.rs
-    pub(crate) fn get_time_since_epoch(&self) -> u64 {
-        self.now_ms()
-    }
-
-    pub(crate) fn wait_next_millis(&self, from_ts: u64, backoff_ms: u64) -> u64 {
-        if let Some(new_ts) = spin_wait(from_ts, &self.config, || self.now_ms()) {
-            return new_ts;
-        }
-        sleep_until_next_ms(from_ts, backoff_ms, || self.now_ms())
     }
 
     #[inline(always)]

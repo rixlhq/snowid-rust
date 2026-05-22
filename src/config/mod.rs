@@ -8,7 +8,7 @@ use std::error::Error;
 use std::fmt;
 
 pub use builder::SnowIDConfigBuilder;
-use builder::{DEFAULT_CUSTOM_EPOCH, DEFAULT_NODE_BITS, DEFAULT_SPIN_ENABLED, DEFAULT_SPIN_LOOPS, DEFAULT_SPIN_YIELD_EVERY};
+use builder::{DEFAULT_CUSTOM_EPOCH, DEFAULT_NODE_BITS};
 
 use crate::SnowID;
 
@@ -43,9 +43,6 @@ pub struct SnowIDConfig {
     timestamp_mask: u64,
     node_mask: u16,
     sequence_mask: u16,
-    spin_enabled: bool,
-    spin_loops: u32,
-    spin_yield_every: u32,
 }
 
 impl SnowIDConfig {
@@ -65,19 +62,12 @@ impl SnowIDConfig {
             timestamp_mask: (1u64 << SnowID::TIMESTAMP_BITS) - 1,
             node_mask: Self::calculate_mask(node_bits),
             sequence_mask: Self::calculate_mask(sequence_bits),
-            spin_enabled: DEFAULT_SPIN_ENABLED,
-            spin_loops: DEFAULT_SPIN_LOOPS,
-            spin_yield_every: DEFAULT_SPIN_YIELD_EVERY,
         }
     }
 
     /// Create config from builder
     pub(crate) fn from_builder(b: SnowIDConfigBuilder) -> Self {
-        let mut cfg = Self::new(b.node_bits, b.custom_epoch);
-        cfg.spin_enabled = b.spin_enabled;
-        cfg.spin_loops = b.spin_loops;
-        cfg.spin_yield_every = b.spin_yield_every;
-        cfg
+        Self::new(b.node_bits, b.custom_epoch)
     }
 
     /// Create a new configuration builder
@@ -114,24 +104,6 @@ impl SnowIDConfig {
     #[must_use]
     pub const fn max_sequence_id(&self) -> u16 {
         self.sequence_mask
-    }
-
-    #[inline(always)]
-    #[must_use]
-    pub const fn spin_enabled(&self) -> bool {
-        self.spin_enabled
-    }
-
-    #[inline(always)]
-    #[must_use]
-    pub const fn spin_loops(&self) -> u32 {
-        self.spin_loops
-    }
-
-    #[inline(always)]
-    #[must_use]
-    pub const fn spin_yield_every(&self) -> u32 {
-        self.spin_yield_every
     }
 
     #[inline(always)]

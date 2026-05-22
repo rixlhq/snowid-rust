@@ -98,7 +98,7 @@ mod tests {
 
     #[test]
     fn test_concurrent_logical_overflow_lockfree() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = Arc::new(SnowID::with_config(7, config).unwrap());
         let num_threads = 16;
         let ids_per_thread = 1024;
@@ -125,7 +125,7 @@ mod tests {
 
     #[test]
     fn test_high_load_shared_logical_generation() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = Arc::new(SnowID::with_config(11, config).unwrap());
         let num_threads = 32;
         let ids_per_thread = 4096;
@@ -152,7 +152,7 @@ mod tests {
 
     #[test]
     fn test_concurrent_logical_batch_generation_lockfree() {
-        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = Arc::new(SnowID::with_config(9, config).unwrap());
         let num_threads = 8;
         let batch_len = 512;
