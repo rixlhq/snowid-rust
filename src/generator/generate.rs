@@ -25,6 +25,12 @@ impl SnowID {
     /// Generate a new SnowID
     #[inline(always)]
     pub fn generate(&self) -> u64 {
+        self.generate_unbounded()
+    }
+
+    /// Generate a new SnowID that waits for wall-clock time when sequence values are exhausted.
+    #[inline(always)]
+    pub fn generate_strict(&self) -> u64 {
         let now = self.now_ms();
         let current = State::from_raw(self.state.load(Ordering::Acquire));
 
