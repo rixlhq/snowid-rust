@@ -8,7 +8,7 @@
 
 **Generate 64-bit unique identifiers that are:**
 
-- ⚡️ Fast (~22ns per ID with default logical generation, ~0.75µs for 1,024-ID batches)
+- ⚡️ Fast (~22ns per ID with default logical generation, ~722-841ns for 1,024-ID batches)
 - 📈 Time-sorted
 - 🔄 Monotonic
 - 🔒 Thread-safe
@@ -35,7 +35,7 @@
 
 ```toml
 [dependencies]
-snowid = "1.0.1"
+snowid = "3.0.0"
 ```
 
 ```rust
@@ -179,12 +179,12 @@ number of IDs written without waiting for the next millisecond.
 
 | Node Bits | Max Nodes | IDs/ms/node before logical rollover | Default `generate()` Time/ID |
 |-----------|-----------|--------------------------------------|------------------------------|
-| 6         | 64        | 65,536                               | ~22.6ns                      |
-| 8         | 256       | 16,384                               | ~22-24ns                     |
-| 10        | 1,024     | 4,096                                | ~22.1ns                      |
-| 12        | 4,096     | 1,024                                | ~22-24ns                     |
-| 14        | 16,384    | 256                                  | ~22-24ns                     |
-| 16        | 65,536    | 64                                   | ~23.6ns                      |
+| 6         | 64        | 65,536                               | ~22ns                        |
+| 8         | 256       | 16,384                               | ~22ns                        |
+| 10        | 1,024     | 4,096                                | ~22ns                        |
+| 12        | 4,096     | 1,024                                | ~22ns                        |
+| 14        | 16,384    | 256                                  | ~22ns                        |
+| 16        | 65,536    | 64                                   | ~24ns                        |
 
 Choose configuration based on your needs:
 
@@ -195,7 +195,7 @@ Choose configuration based on your needs:
 For default logical generation, `node_bits` controls how many IDs fit in a real millisecond before the generator rolls
 forward to a logical timestamp. It no longer forces the hot path to wait. On a local Apple Silicon benchmark run
 (`cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/<N>"`), `node_bits=6`, `node_bits=10`, and
-`node_bits=16` all measured around 22-24ns per ID. Use `try_generate()` when callers prefer an immediate non-blocking
+`node_bits=16` all measured around ~22ns per ID. Use `try_generate()` when callers prefer an immediate non-blocking
 failure over logical timestamp advancement.
 
 Shared-generator contention is the other major throughput factor. A single shared generator is lock-free, but all
@@ -205,8 +205,8 @@ generator per thread, worker, or shard with distinct node IDs for peak throughpu
 
 For burst generation, `generate_batch(&mut [u64])` reserves a logical timestamp range with one atomic update and fills
 the whole buffer. `try_generate_batch(&mut [u64])` is available when callers prefer partial non-blocking reservation.
-On the same machine, filling 1,024 IDs with `generate_batch()` took about 0.77µs, while calling `generate()` 1,024 times
-took about 24.25µs. That is roughly a 32x throughput improvement for callers that can consume IDs in batches.
+On the same machine, filling 1,024 IDs with `generate_batch()` took about 721.62-840.74ns, while calling `generate()`
+1,024 times took about 24.25µs. That is roughly a 32x throughput improvement for callers that can consume IDs in batches.
 
 Focused hotspot benchmarks are available for validating your target machine without running the full benchmark suite:
 
