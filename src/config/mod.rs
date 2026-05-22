@@ -65,11 +65,6 @@ impl SnowIDConfig {
         }
     }
 
-    /// Create config from builder
-    pub(crate) fn from_builder(b: SnowIDConfigBuilder) -> Self {
-        Self::new(b.node_bits, b.custom_epoch)
-    }
-
     /// Create a new configuration builder
     #[must_use]
     pub const fn builder() -> SnowIDConfigBuilder {

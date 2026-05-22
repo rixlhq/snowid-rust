@@ -46,24 +46,27 @@ impl SnowIDExtractor {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::SnowID;
+
+    const fn create_snowid(config: SnowIDConfig, timestamp: u64, node: u16, sequence: u16) -> u64 {
+        ((timestamp & config.timestamp_mask()) << config.timestamp_shift()) | ((node as u64) << config.node_shift()) | (sequence as u64)
+    }
 
     #[test]
     fn test_decompose() {
         let config = SnowIDConfig::default();
-        let snowid_gen = SnowID::with_config(42, config).unwrap();
+        let extractor = SnowIDExtractor::new(config);
 
         let timestamp: u64 = 0x1234567;
         let node: u16 = 42;
         let sequence: u16 = 123;
 
-        let id = snowid_gen.create_snowid_with_node(timestamp, node, sequence);
+        let id = create_snowid(config, timestamp, node, sequence);
 
-        assert_eq!(snowid_gen.extract.timestamp(id), timestamp);
-        assert_eq!(snowid_gen.extract.node(id), node);
-        assert_eq!(snowid_gen.extract.sequence(id), sequence);
+        assert_eq!(extractor.timestamp(id), timestamp);
+        assert_eq!(extractor.node(id), node);
+        assert_eq!(extractor.sequence(id), sequence);
 
-        let (ext_timestamp, ext_node, ext_sequence) = snowid_gen.extract.decompose(id);
+        let (ext_timestamp, ext_node, ext_sequence) = extractor.decompose(id);
         assert_eq!(ext_timestamp, timestamp);
         assert_eq!(ext_node, node);
         assert_eq!(ext_sequence, sequence);
@@ -72,16 +75,16 @@ mod tests {
     #[test]
     fn test_component_boundaries() {
         let config = SnowIDConfig::default();
-        let snowid_gen = SnowID::with_config(1, config).unwrap();
+        let extractor = SnowIDExtractor::new(config);
 
         let max_timestamp = (1u64 << 42) - 1;
         let max_node_id = config.max_node_id();
         let max_sequence = config.max_sequence_id();
 
-        let id = snowid_gen.create_snowid_with_node(max_timestamp, max_node_id, max_sequence);
+        let id = create_snowid(config, max_timestamp, max_node_id, max_sequence);
 
-        assert_eq!(snowid_gen.extract.timestamp(id), max_timestamp);
-        assert_eq!(snowid_gen.extract.node(id), max_node_id);
-        assert_eq!(snowid_gen.extract.sequence(id), max_sequence);
+        assert_eq!(extractor.timestamp(id), max_timestamp);
+        assert_eq!(extractor.node(id), max_node_id);
+        assert_eq!(extractor.sequence(id), max_sequence);
     }
 }

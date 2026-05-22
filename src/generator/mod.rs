@@ -3,7 +3,6 @@
 //! Split into modules for testability:
 //! - `state` - Combined atomic state (timestamp + sequence)
 //! - `time` - Wall-clock time utilities
-//! - `wait` - Spin and backoff strategies
 //! - `generate` - ID generation logic
 
 mod base62_methods;
@@ -100,11 +99,5 @@ impl SnowID {
     #[inline(always)]
     pub(crate) const fn assemble_id(&self, timestamp: u64, sequence: u16) -> u64 {
         ((timestamp & self.ts_mask) << self.ts_shift) | self.node_prefix | (sequence as u64)
-    }
-
-    #[inline(always)]
-    #[allow(dead_code)] // Used in extractor.rs tests
-    pub(crate) const fn create_snowid_with_node(&self, ts: u64, node: u16, seq: u16) -> u64 {
-        ((ts & self.config.timestamp_mask()) << self.config.timestamp_shift()) | ((node as u64) << self.config.node_shift()) | (seq as u64)
     }
 }
