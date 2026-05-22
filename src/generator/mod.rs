@@ -12,6 +12,8 @@ mod state;
 mod time;
 mod wait;
 
+pub use generate::TryGenerateError;
+
 use std::sync::atomic::AtomicU64;
 
 use crate::config::SnowIDConfig;

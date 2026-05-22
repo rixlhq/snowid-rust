@@ -79,4 +79,38 @@ mod tests {
         let timestamps: HashSet<_> = ids.iter().map(|id| generator.extract.timestamp(*id)).collect();
         assert!(!timestamps.is_empty(), "Should have at least one timestamp");
     }
+
+    #[test]
+    fn test_try_generate_matches_generate_contract() {
+        let generator = SnowID::new(1).unwrap();
+        let ids: Vec<u64> = (0..1000).map(|_| generator.try_generate().unwrap()).collect();
+
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+    }
+
+    #[test]
+    fn test_try_generate_batch_fills_unique_monotonic_ids() {
+        let generator = SnowID::new(1).unwrap();
+        let mut ids = [0u64; 128];
+
+        let written = generator.try_generate_batch(&mut ids);
+
+        assert_eq!(written, ids.len());
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+    }
+
+    #[test]
+    fn test_try_generate_batch_returns_partial_capacity() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 128];
+
+        let written = generator.try_generate_batch(&mut ids);
+
+        assert_eq!(written, usize::from(generator.config.max_sequence_id()) + 1);
+        assert_unique_ids(&ids[..written], written);
+        assert_ids_monotonic(&ids[..written]);
+    }
 }
