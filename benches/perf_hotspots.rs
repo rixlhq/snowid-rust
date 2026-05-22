@@ -20,6 +20,14 @@ fn generate_batch(generator: &SnowID, iterations: usize) -> u64 {
     last
 }
 
+fn generate_strict_batch(generator: &SnowID, iterations: usize) -> u64 {
+    let mut last = 0u64;
+    for _ in 0..iterations {
+        last = generator.generate_strict();
+    }
+    last
+}
+
 fn generate_unbounded_batch(generator: &SnowID, iterations: usize) -> u64 {
     let mut last = 0u64;
     for _ in 0..iterations {
@@ -128,7 +136,7 @@ pub fn unbounded_generation(c: &mut Criterion) {
         group.bench_function(format!("generate_strict/node_bits/{node_bits}/batch/1024"), |b| {
             let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().build();
             let generator = SnowID::with_config(1, config).unwrap();
-            b.iter(|| black_box(generate_batch(&generator, 1024)));
+            b.iter(|| black_box(generate_strict_batch(&generator, 1024)));
         });
     }
 
