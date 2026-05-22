@@ -85,7 +85,7 @@ fn main() {
 - 🔤 More compact representation (11 chars max vs 20 digits for u64)
 - 🔗 URL-friendly (no special characters)
 - 👁️ Human-readable and easier to share
-- 🔄 Fully compatible with original SnowID structure
+- 🔄 Directly encodes the same 64-bit SnowID value
 
 ## 🔧 Configuration
 
@@ -105,20 +105,19 @@ fn main() {
 ```
 
 Epochs are validated when creating a generator. SnowID rejects epochs in the future and epochs old enough that the
-42-bit timestamp field cannot represent the current time, preventing silent timestamp wrap or duplicate ID aliasing.
+42-bit timestamp field cannot represent the current time, preventing silent timestamp wrap or duplicate ID collisions.
 
 ### ℹ️ Available Methods
 
 ```rust
-use snowid::{SnowID, BASE62_MAX_LEN};
+use snowid::{SnowID, base62};
 
 fn main() {
     let gen = SnowID::new(1).unwrap();
 
     // Generate numeric IDs
     let id = gen.generate();  // Default logical mode: never waits; timestamp can run ahead under overload
-    let strict_id = gen.generate_strict();  // Waits when wall-clock sequence capacity is exhausted
-    let fast_id = gen.generate_unbounded();  // Alias for explicit logical generation
+    let fast_id = gen.generate_unbounded();  // Explicit logical generation
     let maybe_id = gen.try_generate();  // Non-blocking: returns Err when current millisecond is exhausted
 
     // Reserve many IDs with one atomic update for throughput-oriented hot paths
@@ -132,7 +131,7 @@ fn main() {
 
     // Zero-allocation Base62 generation (for hot paths)
     let (bytes, len) = gen.generate_base62_array();  // Returns [u8; 11] + length
-    let mut buf = [0u8; BASE62_MAX_LEN];
+    let mut buf = [0u8; base62::MAX_LEN];
     let (str_ref, raw_id) = gen.generate_base62_into(&mut buf);  // Returns &str + raw ID
 
     // Decode Base62 IDs
@@ -155,41 +154,17 @@ fn main() {
 }
 ```
 
-### ⏳ Strict Overflow Wait (Spin/Yield)
+### ⏳ Logical Overflow Handling
 
 Default `generate()` does not wait on per-millisecond sequence exhaustion; it advances a logical timestamp and returns
-immediately. If you need wall-clock-oriented timestamps, use `generate_strict()`. You can tune the short busy-wait
-(spin) before strict generation sleeps:
+immediately. IDs stay unique and monotonic for the generator, but the timestamp component can run ahead of wall-clock
+time during sustained overload.
 
-```rust
-use snowid::{SnowID, SnowIDConfig};
-
-fn main() {
-    let config = SnowIDConfig::builder()
-        .node_bits(10).unwrap()
-        .enable_spin(true)   // default: true
-        .spin_loops(64)      // default: 64 spin iterations before sleeping
-        .spin_yield_every(16) // default: yield every 16 iterations (0 disables yielding)
-        .build();
-
-    let gen = SnowID::with_config(1, config).unwrap();
-}
-```
-
-Notes:
-
-- Set `enable_spin(false)` or `spin_loops(0)` to disable spinning entirely.
-- Lower `spin_loops` can reduce CPU usage; higher values may reduce tail latency under overflow.
-
-For latency-sensitive systems that should not sleep inside ID generation, use `try_generate()`. It returns immediately
-with an error when the current millisecond has exhausted its sequence values. For burst-heavy workloads, use
+For callers that must never advance logical time, use `try_generate()`. It returns immediately with an error when the
+current millisecond has exhausted its sequence values or when the generator's logical timestamp is ahead of wall-clock.
+For burst-heavy workloads, use
 `try_generate_batch(&mut [u64])`; it reserves a contiguous sequence range with one atomic state update and returns the
 number of IDs written without waiting for the next millisecond.
-
-By default, `generate()` advances a logical timestamp instead of waiting when the current millisecond's sequence range
-is exhausted. IDs stay unique and monotonic for the generator, but the timestamp component can run ahead of wall-clock
-time during sustained overload. Use `generate_strict()` when timestamp fidelity is more important than avoiding overflow
-waits. `generate_unbounded()` is kept as an explicit name for the default logical behavior.
 
 ## 📊 Performance & Comparisons
 
@@ -221,8 +196,8 @@ Choose configuration based on your needs:
 For default logical generation, `node_bits` controls how many IDs fit in a real millisecond before the generator rolls
 forward to a logical timestamp. It no longer forces the hot path to wait. On a local Apple Silicon benchmark run
 (`cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/<N>"`), `node_bits=6`, `node_bits=10`, and
-`node_bits=16` all measured around 22-24ns per ID. Use `generate_strict()` only when the timestamp component must stay
-bounded by wall-clock time; strict mode can still slow down sharply when sequence capacity is exhausted.
+`node_bits=16` all measured around 22-24ns per ID. Use `try_generate()` when callers prefer an immediate non-blocking
+failure over logical timestamp advancement.
 
 Shared-generator contention is the other major throughput factor. A single shared generator is lock-free, but all
 threads still update one atomic state. In the same local benchmark run, 8 threads sharing one generator for 1,024 IDs
@@ -239,13 +214,11 @@ Focused hotspot benchmarks are available for validating your target machine with
 ```bash
 cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/10"
 cargo bench --bench perf_hotspots -- "Hotspot Unbounded Generation/generate_unbounded/node_bits/16/batch/1024"
-cargo bench --bench perf_hotspots -- "Hotspot Unbounded Generation/generate_strict/node_bits/16/batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/try_generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_loop/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Shared Generator/threads/8/ops_per_thread/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Per Thread Generator/threads/8/ops_per_thread/1024"
-cargo bench --bench perf_hotspots -- "Hotspot Overflow Spin Policy/spin_64_yield_16/batch/256"
 ```
 
 ### Int64 vs Base62 Performance

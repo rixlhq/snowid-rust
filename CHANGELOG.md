@@ -89,7 +89,7 @@
 
 ### Features
 
-*   **base62:** Added zero-allocation APIs `base62_encode_array` and `base62_encode_into` for high-performance encoding without heap allocation.
+*   **base62:** Added zero-allocation APIs `base62::encode_array` and `base62::encode_into` for high-performance encoding without heap allocation.
 *   **core:** Integrated `coarsetime` for ~20x faster time queries (hybrid monotonic/wall-clock approach).
 *   **concurrency:** Improved thread-safety and performance using optimized lock-free patterns for high-contention scenarios.
 *   **config:** Enhanced spin-wait configuration for finer control over latency during sequence overflow.
