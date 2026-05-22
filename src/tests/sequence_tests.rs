@@ -139,4 +139,45 @@ mod tests {
         assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
         assert_eq!(generator.extract.sequence(ids[64]), 0);
     }
+
+    #[test]
+    fn test_generate_defaults_to_logical_timestamp_overflow() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let ids: Vec<u64> = (0..128).map(|_| generator.generate()).collect();
+
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+        assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
+        assert_eq!(generator.extract.sequence(ids[64]), 0);
+    }
+
+    #[test]
+    fn test_generate_batch_handles_sustained_logical_overflow() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 4096];
+
+        generator.generate_batch(&mut ids);
+
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+        assert_eq!(generator.extract.sequence(ids[0]), 0);
+        assert_eq!(generator.extract.sequence(ids[64]), 0);
+        assert_eq!(generator.extract.sequence(ids[4095]), 63);
+        assert_eq!(generator.extract.timestamp(ids[4095]) - generator.extract.timestamp(ids[0]), 63);
+    }
+
+    #[test]
+    fn test_logical_future_state_never_moves_backwards() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 4096];
+        generator.generate_batch(&mut ids);
+
+        let next = generator.generate();
+
+        assert!(next > ids[4095]);
+        assert!(generator.extract.timestamp(next) >= generator.extract.timestamp(ids[4095]));
+    }
 }
