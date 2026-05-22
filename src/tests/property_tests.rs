@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use crate::tests::test_utils::{assert_ids_monotonic, assert_unique_ids};
+    use crate::tests::test_utils::{assert_ids_monotonic, assert_unique_ids, wall_clock_ms};
     use crate::*;
     use proptest::prelude::*;
 
@@ -47,6 +47,19 @@ mod tests {
                 assert_unique_ids(&ids[..written], written);
                 assert_ids_monotonic(&ids[..written]);
             }
+        }
+
+        #[test]
+        fn recent_custom_epochs_preserve_component_bounds(node_bits in 6u8..=16, epoch_offset_ms in 0u64..=86_400_000) {
+            let epoch = wall_clock_ms(0) - epoch_offset_ms;
+            let config = SnowIDConfig::builder().node_bits(node_bits).unwrap().epoch(epoch).build();
+            let generator = SnowID::with_config(1, config).unwrap();
+            let id = generator.generate();
+            let (timestamp, node, sequence) = generator.extract.decompose(id);
+
+            prop_assert!(timestamp <= epoch_offset_ms + 10);
+            prop_assert_eq!(node, 1);
+            prop_assert!(sequence <= generator.config.max_sequence_id());
         }
     }
 }
