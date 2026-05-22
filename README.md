@@ -8,7 +8,7 @@
 
 **Generate 64-bit unique identifiers that are:**
 
-- ⚡️ Fast (~22ns per ID with optimized config)
+- ⚡️ Fast (~22ns per ID with default logical generation, ~0.75µs for 1,024-ID batches)
 - 📈 Time-sorted
 - 🔄 Monotonic
 - 🔒 Thread-safe
@@ -47,6 +47,9 @@ fn main() {
     println!("Generated ID: {}", id);
 }
 ```
+
+`generate()` uses logical timestamp generation by default: it always returns an ID and advances the timestamp component
+instead of waiting when the current millisecond's sequence range is exhausted.
 
 ## 🔠 Base62 Encoded IDs
 
@@ -149,10 +152,11 @@ fn main() {
 }
 ```
 
-### ⏳ Tuning Overflow Wait (Spin/Yield)
+### ⏳ Strict Overflow Wait (Spin/Yield)
 
-When the per-millisecond sequence is exhausted, SnowID waits for the next millisecond. You can tune the short
-busy-wait (spin) before sleeping:
+Default `generate()` does not wait on per-millisecond sequence exhaustion; it advances a logical timestamp and returns
+immediately. If you need wall-clock-oriented timestamps, use `generate_strict()`. You can tune the short busy-wait
+(spin) before strict generation sleeps:
 
 ```rust
 use snowid::{SnowID, SnowIDConfig};
@@ -188,22 +192,22 @@ waits. `generate_unbounded()` is kept as an explicit name for the default logica
 
 ### Social Media Platform Configurations
 
-| Platform  | Timestamp | Node Bits | Sequence Bits | Max Nodes | IDs/ms/node | Time/ID |
-|-----------|-----------|-----------|---------------|-----------|-------------|---------|
-| Twitter   | 41        | 10        | 12            | 1,024     | 4,096       | ~242ns  |
-| Instagram | 41        | 13        | 10            | 8,192     | 1,024       | ~1.94µs |
-| Discord   | 42        | 10        | 12            | 1,024     | 4,096       | ~245ns  |
+| Platform  | Timestamp | Node Bits | Sequence Bits | Max Nodes | IDs/ms/node before logical rollover | Default `generate()` Time/ID |
+|-----------|-----------|-----------|---------------|-----------|--------------------------------------|------------------------------|
+| Twitter   | 41        | 10        | 12            | 1,024     | 4,096                                | ~22ns                        |
+| Instagram | 41        | 13        | 10            | 8,192     | 1,024                                | ~22ns                        |
+| Discord   | 42        | 10        | 12            | 1,024     | 4,096                                | ~22ns                        |
 
 ### Node vs Sequence Bits Trade-off
 
-| Node Bits | Max Nodes | IDs/ms/node | Time/ID |
-|-----------|-----------|-------------|---------|
-| 6         | 64        | 65,536      | ~22ns   |
-| 8         | 256       | 16,384      | ~90ns   |
-| 10        | 1,024     | 4,096       | ~245ns  |
-| 12        | 4,096     | 1,024       | ~1.25µs |
-| 14        | 16,384    | 256         | ~4.9µs  |
-| 16        | 65,536    | 64          | ~15µs   |
+| Node Bits | Max Nodes | IDs/ms/node before logical rollover | Default `generate()` Time/ID |
+|-----------|-----------|--------------------------------------|------------------------------|
+| 6         | 64        | 65,536                               | ~22.6ns                      |
+| 8         | 256       | 16,384                               | ~22-24ns                     |
+| 10        | 1,024     | 4,096                                | ~22.1ns                      |
+| 12        | 4,096     | 1,024                                | ~22-24ns                     |
+| 14        | 16,384    | 256                                  | ~22-24ns                     |
+| 16        | 65,536    | 64                                   | ~23.6ns                      |
 
 Choose configuration based on your needs:
 
@@ -211,11 +215,11 @@ Choose configuration based on your needs:
 - More IDs per node → Increase sequence bits (min 6 node bits = 64 nodes)
 - Total bits (node + sequence) is fixed at 22 bits
 
-For maximum throughput, pick the lowest `node_bits` value that still covers your deployment. More node bits reduce
-per-node sequence capacity, so burst-heavy workloads reach the overflow wait path sooner. On a local Apple Silicon
-benchmark run (`cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/<N>"`), the same generator
-measured approximately 26.5ns at `node_bits=6`, 315ns at the default `node_bits=10`, and 22.7µs at `node_bits=16`.
-Treat these numbers as machine-specific, but the trend is expected: sequence capacity is the main performance lever.
+For default logical generation, `node_bits` controls how many IDs fit in a real millisecond before the generator rolls
+forward to a logical timestamp. It no longer forces the hot path to wait. On a local Apple Silicon benchmark run
+(`cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/<N>"`), `node_bits=6`, `node_bits=10`, and
+`node_bits=16` all measured around 22-24ns per ID. Use `generate_strict()` only when the timestamp component must stay
+bounded by wall-clock time; strict mode can still slow down sharply when sequence capacity is exhausted.
 
 Shared-generator contention is the other major throughput factor. A single shared generator is lock-free, but all
 threads still update one atomic state. In the same local benchmark run, 8 threads sharing one generator for 1,024 IDs
@@ -224,8 +228,8 @@ generator per thread, worker, or shard with distinct node IDs for peak throughpu
 
 For burst generation, `generate_batch(&mut [u64])` reserves a logical timestamp range with one atomic update and fills
 the whole buffer. `try_generate_batch(&mut [u64])` is available when callers prefer partial non-blocking reservation.
-On the same machine, reserving and writing 1,024 IDs took about 1.33µs, while calling `generate()` 1,024 times took
-about 23.1µs. That is roughly a 17x throughput improvement for callers that can consume IDs in batches.
+On the same machine, filling 1,024 IDs with `generate_batch()` took about 0.77µs, while calling `generate()` 1,024 times
+took about 24.25µs. That is roughly a 32x throughput improvement for callers that can consume IDs in batches.
 
 Focused hotspot benchmarks are available for validating your target machine without running the full benchmark suite:
 
@@ -245,7 +249,7 @@ cargo bench --bench perf_hotspots -- "Hotspot Overflow Spin Policy/spin_64_yield
 
 | Variant          | Time/ID | Size         | Notes                        |
 |------------------|---------|--------------|------------------------------|
-| Int64            | ~245 ns | 18-20 digits | Fastest option               |
+| Int64            | ~22 ns  | 18-20 digits | Fastest single-ID option     |
 | Base62 (String)  | ~260 ns | 10-11 chars  | Compact, URL-friendly        |
 | Base62 (array)   | ~260 ns | 10-11 chars  | Zero-allocation, hot paths   |
 | Base62 (into)    | ~260 ns | 10-11 chars  | Zero-allocation, reuse buffer|
