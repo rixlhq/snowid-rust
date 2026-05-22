@@ -20,7 +20,7 @@ use crate::config::SnowIDConfig;
 use crate::error::SnowIDError;
 use crate::extractor::SnowIDExtractor;
 
-use time::time_since_epoch;
+use time::{time_since_epoch, unix_time_ms};
 use wait::{sleep_until_next_ms, spin_wait};
 
 /// Main ID generator with cache-line alignment
@@ -44,6 +44,7 @@ pub struct SnowID {
 impl SnowID {
     pub const TIMESTAMP_BITS: u32 = 42;
     pub const TOTAL_NODE_AND_SEQUENCE_BITS: u8 = 22;
+    pub const MAX_TIMESTAMP: u64 = (1u64 << Self::TIMESTAMP_BITS) - 1;
 
     /// Create with default configuration
     pub fn new(node_id: u16) -> Result<Self, SnowIDError> {
@@ -60,6 +61,16 @@ impl SnowID {
         let max = config.max_node_id();
         if node_id > max {
             return Err(SnowIDError::InvalidNodeId { node_id, max });
+        }
+        Self::validate_epoch(config)?;
+        Ok(())
+    }
+
+    fn validate_epoch(config: &SnowIDConfig) -> Result<(), SnowIDError> {
+        let now = unix_time_ms();
+        let epoch = config.epoch();
+        if epoch > now || now - epoch > Self::MAX_TIMESTAMP {
+            return Err(SnowIDError::InvalidEpoch { epoch, now, max_age_ms: Self::MAX_TIMESTAMP });
         }
         Ok(())
     }

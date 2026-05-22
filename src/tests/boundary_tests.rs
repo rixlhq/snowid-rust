@@ -3,6 +3,7 @@ mod tests {
     use crate::SnowID;
     use crate::SnowIDError;
     use crate::config::SnowIDConfig;
+    use crate::tests::test_utils::wall_clock_ms;
 
     #[test]
     fn test_invalid_node_id() {
@@ -78,5 +79,27 @@ mod tests {
         assert!(timestamp <= generator.config.timestamp_mask());
         assert!(node <= generator.config.max_node_id());
         assert!(sequence <= generator.config.max_sequence_id());
+    }
+
+    #[test]
+    fn test_future_epoch_is_rejected() {
+        let future_epoch = generator_now_unix_ms() + 60_000;
+        let config = SnowIDConfig::builder().epoch(future_epoch).build();
+
+        assert!(matches!(SnowID::with_config(1, config), Err(SnowIDError::InvalidEpoch { .. })));
+    }
+
+    #[test]
+    fn test_epoch_beyond_timestamp_horizon_is_rejected() {
+        let old_epoch = 0;
+        let config = SnowIDConfig::builder().epoch(old_epoch).build();
+
+        if generator_now_unix_ms() > SnowID::MAX_TIMESTAMP {
+            assert!(matches!(SnowID::with_config(1, config), Err(SnowIDError::InvalidEpoch { .. })));
+        }
+    }
+
+    fn generator_now_unix_ms() -> u64 {
+        wall_clock_ms(0)
     }
 }

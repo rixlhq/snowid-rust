@@ -10,7 +10,7 @@ use super::wait::next_backoff;
 
 struct LogicalBatchStart {
     base_ts: u64,
-    start_seq: u16,
+    start: usize,
     capacity: usize,
 }
 
@@ -31,15 +31,7 @@ impl SnowID {
     /// Generate a new SnowID that waits for wall-clock time when sequence values are exhausted.
     #[inline(always)]
     pub fn generate_strict(&self) -> u64 {
-        let now = self.now_ms();
-        let current = State::from_raw(self.state.load(Ordering::Acquire));
-
-        // Fast path: try to claim or increment
-        if let Some(id) = self.try_generate_once(now, current) {
-            return id;
-        }
-
-        self.generate_slow_path()
+        self.generate_strict_loop()
     }
 
     /// Try to generate a new SnowID without waiting for the next millisecond.
@@ -51,7 +43,9 @@ impl SnowID {
         loop {
             let now = self.now_ms();
             let current = State::from_raw(self.state.load(Ordering::Acquire));
-            if let Some(id) = self.try_generate_once(now, current) {
+            if now >= current.timestamp()
+                && let Some(id) = self.try_generate_once(now, current)
+            {
                 return Ok(id);
             }
 
@@ -76,7 +70,9 @@ impl SnowID {
         loop {
             let now = self.now_ms();
             let current = State::from_raw(self.state.load(Ordering::Acquire));
-            if let Some(written) = self.try_reserve_batch(now, current, out) {
+            if now >= current.timestamp()
+                && let Some(written) = self.try_reserve_batch(now, current, out)
+            {
                 return written;
             }
 
@@ -158,10 +154,7 @@ impl SnowID {
     #[inline(always)]
     fn try_reserve_batch(&self, now: u64, current: State, out: &mut [u64]) -> Option<usize> {
         let ts = current.timestamp();
-        let start_seq = if now > ts { 0 } else { current.sequence().saturating_add(1) };
-        if start_seq > self.max_seq {
-            return None;
-        }
+        let start_seq = self.next_strict_sequence(now, current)?;
 
         let remaining = self.max_seq - start_seq;
         let requested = u16::try_from(out.len().saturating_sub(1)).unwrap_or(u16::MAX);
@@ -185,25 +178,42 @@ impl SnowID {
     fn try_reserve_logical_batch(&self, now: u64, current: State, out: &mut [u64]) -> bool {
         let ts = current.timestamp();
         let base_ts = now.max(ts);
-        let start_seq = if base_ts > ts { 0 } else { current.sequence().saturating_add(1) };
         let capacity = usize::from(self.max_seq) + 1;
-        let final_index = usize::from(start_seq) + out.len() - 1;
-        let final_ts = base_ts + (final_index / capacity) as u64;
+        let start = self.next_logical_sequence_index(base_ts, current);
+        let final_index = start + out.len() - 1;
+        let final_ts = base_ts.saturating_add((final_index / capacity) as u64);
         let final_seq = u16::try_from(final_index % capacity).unwrap_or(self.max_seq);
 
         if !self.cas_state(current, State::new(final_ts, final_seq)) {
             return false;
         }
 
-        self.fill_logical_batch(out, LogicalBatchStart { base_ts, start_seq, capacity });
+        self.fill_logical_batch(out, LogicalBatchStart { base_ts, start, capacity });
         true
+    }
+
+    #[inline(always)]
+    fn next_strict_sequence(&self, now: u64, current: State) -> Option<u16> {
+        if now > current.timestamp() {
+            return Some(0);
+        }
+        let seq = current.sequence();
+        (seq < self.max_seq).then(|| seq + 1)
+    }
+
+    #[inline(always)]
+    fn next_logical_sequence_index(&self, base_ts: u64, current: State) -> usize {
+        if base_ts > current.timestamp() {
+            return 0;
+        }
+        let seq = current.sequence();
+        if seq < self.max_seq { usize::from(seq) + 1 } else { usize::from(self.max_seq) + 1 }
     }
 
     #[inline]
     fn fill_logical_batch(&self, out: &mut [u64], batch: LogicalBatchStart) {
-        let start = usize::from(batch.start_seq);
         for (offset, id) in out.iter_mut().enumerate() {
-            let index = start + offset;
+            let index = batch.start + offset;
             let timestamp = batch.base_ts + (index / batch.capacity) as u64;
             let sequence = u16::try_from(index % batch.capacity).unwrap_or(self.max_seq);
             *id = self.assemble_id(timestamp, sequence);
@@ -239,10 +249,9 @@ impl SnowID {
             .is_ok()
     }
 
-    /// Slow path for contended generation
     #[cold]
     #[inline(never)]
-    fn generate_slow_path(&self) -> u64 {
+    fn generate_strict_loop(&self) -> u64 {
         let mut backoff_ms = 1u64;
 
         loop {
@@ -250,13 +259,13 @@ impl SnowID {
             let current = State::from_raw(self.state.load(Ordering::Acquire));
             let timestamp = current.timestamp();
 
-            if let Some(id) = self.try_generate_once(now, current) {
+            if now >= timestamp
+                && let Some(id) = self.try_generate_once(now, current)
+            {
                 return id;
             }
 
-            // Retry immediately on CAS contention; only wait when the loaded
-            // state shows the current millisecond is actually exhausted.
-            if now > timestamp || current.sequence() < self.max_seq {
+            if now >= timestamp && (now > timestamp || current.sequence() < self.max_seq) {
                 continue;
             }
 
