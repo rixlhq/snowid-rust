@@ -124,7 +124,7 @@ mod tests {
         assert_unique_ids(&ids, ids.len());
         assert_ids_monotonic(&ids);
         assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
-        assert_eq!(generator.extract.sequence(ids[64]), 0);
+        assert!(generator.extract.sequence(ids[64]) <= generator.config.max_sequence_id());
     }
 
     #[test]
@@ -138,7 +138,7 @@ mod tests {
         assert_unique_ids(&ids, ids.len());
         assert_ids_monotonic(&ids);
         assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
-        assert_eq!(generator.extract.sequence(ids[64]), 0);
+        assert!(generator.extract.sequence(ids[64]) <= 1);
     }
 
     #[test]

@@ -13,6 +13,7 @@ mod config_tests;
 mod core_tests;
 mod edge_case_tests;
 mod extraction_tests;
+mod property_tests;
 mod sequence_tests;
 pub mod test_utils;
 mod timestamp_tests;
