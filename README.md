@@ -270,6 +270,12 @@ Check out [examples](examples/) for:
 - Distributed generation
 - Performance benchmarks
 
+## 🧪 Correctness Stress Testing
+
+The test suite includes deterministic unit tests, high-load multithread tests, and property-based tests for ID
+uniqueness, monotonicity, sequence bounds, logical timestamp rollover, and batch generation. For Stryker-style mutation
+testing in Rust, see [MUTATION_TESTING.md](MUTATION_TESTING.md) for `cargo-mutants` commands and release-gate guidance.
+
 ## 📜 License
 
 MIT - See [LICENSE](LICENSE) for details
