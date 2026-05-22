@@ -77,6 +77,7 @@ base62 = "2.2.4"
 criterion = { version = "0.8.2", features = ["html_reports"] }
 rand = "0.10.1"
 chrono = "0.4.44"
+proptest = "1.11.0"
 
 [[bench]]
 name = "snowid_benchmarks"
