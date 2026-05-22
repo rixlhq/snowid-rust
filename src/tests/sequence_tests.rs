@@ -113,4 +113,30 @@ mod tests {
         assert_unique_ids(&ids[..written], written);
         assert_ids_monotonic(&ids[..written]);
     }
+
+    #[test]
+    fn test_generate_unbounded_advances_logical_timestamp() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let ids: Vec<u64> = (0..128).map(|_| generator.generate_unbounded()).collect();
+
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+        assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
+        assert_eq!(generator.extract.sequence(ids[64]), 0);
+    }
+
+    #[test]
+    fn test_generate_batch_fills_full_buffer_across_logical_timestamps() {
+        let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let generator = SnowID::with_config(1, config).unwrap();
+        let mut ids = [0u64; 128];
+
+        generator.generate_batch(&mut ids);
+
+        assert_unique_ids(&ids, ids.len());
+        assert_ids_monotonic(&ids);
+        assert!(generator.extract.timestamp(ids[64]) > generator.extract.timestamp(ids[0]));
+        assert_eq!(generator.extract.sequence(ids[64]), 0);
+    }
 }
