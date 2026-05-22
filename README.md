@@ -104,6 +104,9 @@ fn main() {
 }
 ```
 
+Epochs are validated when creating a generator. SnowID rejects epochs in the future and epochs old enough that the
+42-bit timestamp field cannot represent the current time, preventing silent timestamp wrap or duplicate ID aliasing.
+
 ### ℹ️ Available Methods
 
 ```rust
