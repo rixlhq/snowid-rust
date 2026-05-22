@@ -225,9 +225,11 @@ cargo bench --bench perf_hotspots -- "Hotspot Per Thread Generator/threads/8/ops
 | Variant          | Time/ID | Size         | Notes                        |
 |------------------|---------|--------------|------------------------------|
 | Int64            | ~22 ns  | 18-20 digits | Fastest single-ID option     |
-| Base62 (String)  | ~260 ns | 10-11 chars  | Compact, URL-friendly        |
-| Base62 (array)   | ~260 ns | 10-11 chars  | Zero-allocation, hot paths   |
-| Base62 (into)    | ~260 ns | 10-11 chars  | Zero-allocation, reuse buffer|
+| Base62 (String)  | ~40 ns  | 10-11 chars  | Compact, URL-friendly        |
+| Base62 (array)   | ~24 ns  | 10-11 chars  | Zero-allocation, hot paths   |
+| Base62 (into)    | ~24 ns  | 10-11 chars  | Zero-allocation, reuse buffer|
+
+These Base62 numbers include ID generation plus encoding from the targeted `ID Generation Comparison` benchmark.
 
 Base62 encoding provides more compact, URL-friendly IDs. For hot paths, use `generate_base62_array()` or `generate_base62_into()` to avoid heap allocations.
 
