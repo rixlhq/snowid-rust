@@ -21,10 +21,20 @@ pub struct TryGenerateError {
 }
 
 impl SnowID {
-    /// Generate a new SnowID
+    /// Generate a new SnowID without waiting for wall-clock time on sequence exhaustion.
+    ///
+    /// When the current millisecond has no remaining sequence values, this method advances the
+    /// generator's logical timestamp and returns immediately. The timestamp component can run
+    /// ahead of wall-clock time under sustained overload.
     #[inline(always)]
     pub fn generate(&self) -> u64 {
-        self.generate_unbounded()
+        loop {
+            let now = self.now_ms();
+            let current = State::from_raw(self.state.load(Ordering::Acquire));
+            if let Some(id) = self.try_generate_logical_once(now, current) {
+                return id;
+            }
+        }
     }
 
     /// Try to generate a new SnowID without waiting for the next millisecond.
@@ -76,22 +86,6 @@ impl SnowID {
         }
     }
 
-    /// Generate a new SnowID without waiting for wall-clock time on sequence exhaustion.
-    ///
-    /// When the current millisecond has no remaining sequence values, this method advances the
-    /// generator's logical timestamp and returns immediately. The timestamp component can run
-    /// ahead of wall-clock time under sustained overload.
-    #[inline]
-    pub fn generate_unbounded(&self) -> u64 {
-        loop {
-            let now = self.now_ms();
-            let current = State::from_raw(self.state.load(Ordering::Acquire));
-            if let Some(id) = self.try_generate_unbounded_once(now, current) {
-                return id;
-            }
-        }
-    }
-
     /// Fill `out` with SnowIDs without waiting for wall-clock time on sequence exhaustion.
     ///
     /// This reserves a logical timestamp range with one atomic state update, then fills the full
@@ -130,7 +124,7 @@ impl SnowID {
     }
 
     #[inline(always)]
-    fn try_generate_unbounded_once(&self, now: u64, current: State) -> Option<u64> {
+    fn try_generate_logical_once(&self, now: u64, current: State) -> Option<u64> {
         let ts = current.timestamp();
         let seq = current.sequence();
         let (new_ts, new_seq) = if now > ts {

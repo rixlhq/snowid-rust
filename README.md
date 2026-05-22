@@ -117,7 +117,6 @@ fn main() {
 
     // Generate numeric IDs
     let id = gen.generate();  // Default logical mode: never waits; timestamp can run ahead under overload
-    let fast_id = gen.generate_unbounded();  // Explicit logical generation
     let maybe_id = gen.try_generate();  // Non-blocking: returns Err when current millisecond is exhausted
 
     // Reserve many IDs with one atomic update for throughput-oriented hot paths
@@ -213,7 +212,7 @@ Focused hotspot benchmarks are available for validating your target machine with
 
 ```bash
 cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/10"
-cargo bench --bench perf_hotspots -- "Hotspot Unbounded Generation/generate_unbounded/node_bits/16/batch/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Logical Generation/generate/node_bits/16/batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/try_generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_loop/1024"
