@@ -138,4 +138,32 @@ mod tests {
         let tss: HashSet<_> = ids.iter().map(|id| g.extract.timestamp(*id)).collect();
         assert!(tss.len() > 1, "Should cross ms boundaries");
     }
+
+    #[test]
+    fn test_logical_future_timestamp_resyncs_after_wall_clock_catches_up() {
+        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let g = SnowID::with_config(1, cfg).unwrap();
+        let mut ids = [0u64; 128];
+        g.generate_batch(&mut ids);
+        let future_ts = g.extract.timestamp(ids[127]);
+
+        thread::sleep(Duration::from_millis(3));
+        let after_wait = g.extract.timestamp(g.generate());
+
+        assert!(after_wait >= future_ts);
+        assert_timestamp_accurate(after_wait, g.config.epoch(), 10);
+    }
+
+    #[test]
+    fn test_try_generate_recovers_after_wall_clock_catches_logical_future() {
+        let cfg = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
+        let g = SnowID::with_config(1, cfg).unwrap();
+        let mut ids = [0u64; 128];
+        g.generate_batch(&mut ids);
+
+        assert!(g.try_generate().is_err());
+        thread::sleep(Duration::from_millis(3));
+
+        assert!(g.try_generate().is_ok());
+    }
 }
