@@ -110,8 +110,9 @@ fn main() {
     let gen = SnowID::new(1).unwrap();
 
     // Generate numeric IDs
-    let id = gen.generate();
-    let fast_id = gen.generate_unbounded();  // Never waits; timestamp can run ahead under overload
+    let id = gen.generate();  // Default logical mode: never waits; timestamp can run ahead under overload
+    let strict_id = gen.generate_strict();  // Waits when wall-clock sequence capacity is exhausted
+    let fast_id = gen.generate_unbounded();  // Alias for explicit logical generation
     let maybe_id = gen.try_generate();  // Non-blocking: returns Err when current millisecond is exhausted
 
     // Reserve many IDs with one atomic update for throughput-oriented hot paths
@@ -178,10 +179,10 @@ with an error when the current millisecond has exhausted its sequence values. Fo
 `try_generate_batch(&mut [u64])`; it reserves a contiguous sequence range with one atomic state update and returns the
 number of IDs written without waiting for the next millisecond.
 
-For maximum throughput when callers must always receive IDs, use `generate_unbounded()` or `generate_batch(&mut [u64])`.
-These methods advance a logical timestamp instead of waiting when the current millisecond's sequence range is exhausted.
-IDs stay unique and monotonic for the generator, but the timestamp component can run ahead of wall-clock time during
-sustained overload. Use `generate()` when timestamp fidelity is more important than avoiding overflow waits.
+By default, `generate()` advances a logical timestamp instead of waiting when the current millisecond's sequence range
+is exhausted. IDs stay unique and monotonic for the generator, but the timestamp component can run ahead of wall-clock
+time during sustained overload. Use `generate_strict()` when timestamp fidelity is more important than avoiding overflow
+waits. `generate_unbounded()` is kept as an explicit name for the default logical behavior.
 
 ## 📊 Performance & Comparisons
 
