@@ -111,10 +111,12 @@ fn main() {
 
     // Generate numeric IDs
     let id = gen.generate();
+    let fast_id = gen.generate_unbounded();  // Never waits; timestamp can run ahead under overload
     let maybe_id = gen.try_generate();  // Non-blocking: returns Err when current millisecond is exhausted
 
     // Reserve many IDs with one atomic update for throughput-oriented hot paths
     let mut batch = [0u64; 128];
+    gen.generate_batch(&mut batch);  // Always fills; timestamp can run ahead under overload
     let written = gen.try_generate_batch(&mut batch);  // May return fewer than batch.len() without waiting
 
     // Generate Base62 encoded IDs (allocates String)
@@ -176,6 +178,11 @@ with an error when the current millisecond has exhausted its sequence values. Fo
 `try_generate_batch(&mut [u64])`; it reserves a contiguous sequence range with one atomic state update and returns the
 number of IDs written without waiting for the next millisecond.
 
+For maximum throughput when callers must always receive IDs, use `generate_unbounded()` or `generate_batch(&mut [u64])`.
+These methods advance a logical timestamp instead of waiting when the current millisecond's sequence range is exhausted.
+IDs stay unique and monotonic for the generator, but the timestamp component can run ahead of wall-clock time during
+sustained overload. Use `generate()` when timestamp fidelity is more important than avoiding overflow waits.
+
 ## 📊 Performance & Comparisons
 
 ### Social Media Platform Configurations
@@ -214,7 +221,8 @@ threads still update one atomic state. In the same local benchmark run, 8 thread
 each took about 2.64ms, while 8 per-thread generators took about 145µs. If your topology allows it, prefer one
 generator per thread, worker, or shard with distinct node IDs for peak throughput.
 
-For burst generation, `try_generate_batch(&mut [u64])` reserves a contiguous sequence range with one atomic update.
+For burst generation, `generate_batch(&mut [u64])` reserves a logical timestamp range with one atomic update and fills
+the whole buffer. `try_generate_batch(&mut [u64])` is available when callers prefer partial non-blocking reservation.
 On the same machine, reserving and writing 1,024 IDs took about 1.33µs, while calling `generate()` 1,024 times took
 about 23.1µs. That is roughly a 17x throughput improvement for callers that can consume IDs in batches.
 
@@ -222,6 +230,9 @@ Focused hotspot benchmarks are available for validating your target machine with
 
 ```bash
 cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/10"
+cargo bench --bench perf_hotspots -- "Hotspot Unbounded Generation/generate_unbounded/node_bits/16/batch/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Unbounded Generation/generate_strict/node_bits/16/batch/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/try_generate_batch/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_loop/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Shared Generator/threads/8/ops_per_thread/1024"
