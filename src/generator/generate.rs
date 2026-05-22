@@ -50,7 +50,7 @@ impl SnowID {
             }
 
             let timestamp = current.timestamp();
-            if now < timestamp || current.sequence() >= self.max_seq {
+            if now < timestamp || (now == timestamp && current.sequence() >= self.max_seq) {
                 return Err(TryGenerateError { timestamp });
             }
         }
@@ -77,7 +77,7 @@ impl SnowID {
             }
 
             let timestamp = current.timestamp();
-            if now < timestamp || current.sequence() >= self.max_seq {
+            if now < timestamp || (now == timestamp && current.sequence() >= self.max_seq) {
                 return 0;
             }
         }
