@@ -111,6 +111,11 @@ fn main() {
 
     // Generate numeric IDs
     let id = gen.generate();
+    let maybe_id = gen.try_generate();  // Non-blocking: returns Err when current millisecond is exhausted
+
+    // Reserve many IDs with one atomic update for throughput-oriented hot paths
+    let mut batch = [0u64; 128];
+    let written = gen.try_generate_batch(&mut batch);  // May return fewer than batch.len() without waiting
 
     // Generate Base62 encoded IDs (allocates String)
     let base62_id = gen.generate_base62();
@@ -166,6 +171,11 @@ Notes:
 - Set `enable_spin(false)` or `spin_loops(0)` to disable spinning entirely.
 - Lower `spin_loops` can reduce CPU usage; higher values may reduce tail latency under overflow.
 
+For latency-sensitive systems that should not sleep inside ID generation, use `try_generate()`. It returns immediately
+with an error when the current millisecond has exhausted its sequence values. For burst-heavy workloads, use
+`try_generate_batch(&mut [u64])`; it reserves a contiguous sequence range with one atomic state update and returns the
+number of IDs written without waiting for the next millisecond.
+
 ## 📊 Performance & Comparisons
 
 ### Social Media Platform Configurations
@@ -204,10 +214,16 @@ threads still update one atomic state. In the same local benchmark run, 8 thread
 each took about 2.64ms, while 8 per-thread generators took about 145µs. If your topology allows it, prefer one
 generator per thread, worker, or shard with distinct node IDs for peak throughput.
 
+For burst generation, `try_generate_batch(&mut [u64])` reserves a contiguous sequence range with one atomic update.
+On the same machine, reserving and writing 1,024 IDs took about 1.33µs, while calling `generate()` 1,024 times took
+about 23.1µs. That is roughly a 17x throughput improvement for callers that can consume IDs in batches.
+
 Focused hotspot benchmarks are available for validating your target machine without running the full benchmark suite:
 
 ```bash
 cargo bench --bench perf_hotspots -- "Hotspot Generate Capacity/node_bits/10"
+cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/try_generate_batch/1024"
+cargo bench --bench perf_hotspots -- "Hotspot Batch Reservation/generate_loop/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Shared Generator/threads/8/ops_per_thread/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Per Thread Generator/threads/8/ops_per_thread/1024"
 cargo bench --bench perf_hotspots -- "Hotspot Overflow Spin Policy/spin_64_yield_16/batch/256"
