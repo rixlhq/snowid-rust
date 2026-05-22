@@ -191,14 +191,14 @@ mod tests {
 
         let err = generator.try_generate().unwrap_err();
 
-        assert_eq!(err.timestamp, generator.extract.timestamp(ids[127]));
+        assert_eq!(err.timestamp, generator.extract.timestamp(ids[ids.len() - 1]));
     }
 
     #[test]
     fn test_try_generate_batch_returns_zero_when_logical_state_is_future() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().enable_spin(false).build();
         let generator = SnowID::with_config(1, config).unwrap();
-        let mut ids = [0u64; 128];
+        let mut ids = [0u64; 4096];
         let mut out = [0u64; 4];
         generator.generate_batch(&mut ids);
 
