@@ -8,6 +8,12 @@ use super::SnowID;
 use super::state::State;
 use super::wait::next_backoff;
 
+struct LogicalBatchStart {
+    base_ts: u64,
+    start_seq: u16,
+    capacity: usize,
+}
+
 /// Error returned by non-blocking generation APIs when the current millisecond is exhausted.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TryGenerateError {
@@ -75,6 +81,41 @@ impl SnowID {
         }
     }
 
+    /// Generate a new SnowID without waiting for wall-clock time on sequence exhaustion.
+    ///
+    /// When the current millisecond has no remaining sequence values, this method advances the
+    /// generator's logical timestamp and returns immediately. The timestamp component can run
+    /// ahead of wall-clock time under sustained overload.
+    #[inline]
+    pub fn generate_unbounded(&self) -> u64 {
+        loop {
+            let now = self.now_ms();
+            let current = State::from_raw(self.state.load(Ordering::Acquire));
+            if let Some(id) = self.try_generate_unbounded_once(now, current) {
+                return id;
+            }
+        }
+    }
+
+    /// Fill `out` with SnowIDs without waiting for wall-clock time on sequence exhaustion.
+    ///
+    /// This reserves a logical timestamp range with one atomic state update, then fills the full
+    /// buffer. The timestamp component can run ahead of wall-clock time under sustained overload.
+    #[inline]
+    pub fn generate_batch(&self, out: &mut [u64]) {
+        if out.is_empty() {
+            return;
+        }
+
+        loop {
+            let now = self.now_ms();
+            let current = State::from_raw(self.state.load(Ordering::Acquire));
+            if self.try_reserve_logical_batch(now, current, out) {
+                return;
+            }
+        }
+    }
+
     /// Attempt a single generation: claim new ms or increment sequence.
     #[inline(always)]
     fn try_generate_once(&self, now: u64, current: State) -> Option<u64> {
@@ -91,6 +132,21 @@ impl SnowID {
             }
         }
         None
+    }
+
+    #[inline(always)]
+    fn try_generate_unbounded_once(&self, now: u64, current: State) -> Option<u64> {
+        let ts = current.timestamp();
+        let seq = current.sequence();
+        let (new_ts, new_seq) = if now > ts {
+            (now, 0)
+        } else if seq < self.max_seq {
+            (ts, seq + 1)
+        } else {
+            (ts + 1, 0)
+        };
+
+        self.cas_state(current, State::new(new_ts, new_seq)).then(|| self.assemble_id(new_ts, new_seq))
     }
 
     #[inline(always)]
@@ -117,6 +173,35 @@ impl SnowID {
             *id = self.assemble_id(new_ts, start_seq + offset);
         }
         Some(written)
+    }
+
+    #[inline]
+    fn try_reserve_logical_batch(&self, now: u64, current: State, out: &mut [u64]) -> bool {
+        let ts = current.timestamp();
+        let base_ts = now.max(ts);
+        let start_seq = if base_ts > ts { 0 } else { current.sequence().saturating_add(1) };
+        let capacity = usize::from(self.max_seq) + 1;
+        let final_index = usize::from(start_seq) + out.len() - 1;
+        let final_ts = base_ts + (final_index / capacity) as u64;
+        let final_seq = u16::try_from(final_index % capacity).unwrap_or(self.max_seq);
+
+        if !self.cas_state(current, State::new(final_ts, final_seq)) {
+            return false;
+        }
+
+        self.fill_logical_batch(out, LogicalBatchStart { base_ts, start_seq, capacity });
+        true
+    }
+
+    #[inline]
+    fn fill_logical_batch(&self, out: &mut [u64], batch: LogicalBatchStart) {
+        let start = usize::from(batch.start_seq);
+        for (offset, id) in out.iter_mut().enumerate() {
+            let index = start + offset;
+            let timestamp = batch.base_ts + (index / batch.capacity) as u64;
+            let sequence = u16::try_from(index % batch.capacity).unwrap_or(self.max_seq);
+            *id = self.assemble_id(timestamp, sequence);
+        }
     }
 
     /// Try to claim new millisecond with sequence 0
