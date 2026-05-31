@@ -23,7 +23,7 @@ mod tests {
         let ts2 = g.extract.timestamp(g.generate());
 
         let diff = ts2 - ts1;
-        assert!((80..=150).contains(&diff), "Expected ~100ms, got {}ms", diff);
+        assert!((80..=150).contains(&diff), "Expected ~100ms, got {diff}ms");
     }
 
     #[test]
@@ -56,7 +56,7 @@ mod tests {
                 max_drift = max_drift.max(ts - after);
             }
         }
-        assert!(max_drift <= 5, "Max drift {}ms", max_drift);
+        assert!(max_drift <= 5, "Max drift {max_drift}ms");
     }
 
     #[test]
@@ -116,7 +116,7 @@ mod tests {
             let ts2 = g.extract.timestamp(g.generate());
 
             let diff = ts2 - ts1;
-            assert!(diff >= (ms * 7 / 10) && diff <= ms * 2 + 5, "Sleep {}ms: got {}ms", ms, diff);
+            assert!(diff >= (ms * 7 / 10) && diff <= ms * 2 + 5, "Sleep {ms}ms: got {diff}ms");
         }
     }
 

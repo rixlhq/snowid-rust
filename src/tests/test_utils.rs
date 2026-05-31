@@ -26,7 +26,7 @@ pub fn assert_ids_monotonic(ids: &[u64]) {
 pub fn assert_monotonic_sorted(ids: &mut [u64]) {
     ids.sort_unstable();
     for i in 1..ids.len() {
-        assert!(ids[i] > ids[i - 1], "ID at position {} ({}) is not greater than previous ID ({})", i, ids[i], ids[i - 1]);
+        assert!(ids[i] > ids[i - 1], "ID at position {i} ({}) is not greater than previous ID ({})", ids[i], ids[i - 1]);
     }
 }
 
@@ -40,5 +40,5 @@ pub fn assert_unique_and_monotonic(mut ids: Vec<u64>, expected_count: usize) {
 pub fn assert_timestamp_accurate(ts: u64, epoch: u64, tolerance_ms: u64) {
     let wall_ts = wall_clock_ms(epoch);
     let diff = wall_ts.abs_diff(ts);
-    assert!(diff <= tolerance_ms, "Timestamp drift: ts={}, wall={}, diff={}ms (max {}ms)", ts, wall_ts, diff, tolerance_ms);
+    assert!(diff <= tolerance_ms, "Timestamp drift: ts={ts}, wall={wall_ts}, diff={diff}ms (max {tolerance_ms}ms)");
 }
