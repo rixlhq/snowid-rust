@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.1](https://github.com/rixlhq/snowid-rust/compare/v3.0.0...v3.0.1) (2026-05-31)
+
+
+### Bug Fixes
+
+* **docs:** add missing backticks to doc comments ([71cfcbf](https://github.com/rixlhq/snowid-rust/commit/71cfcbf8ecd9d3f85d98ebb46f2bcaf3048e8eb5))
+* **lints:** address clippy warnings in config module ([9ec4c53](https://github.com/rixlhq/snowid-rust/commit/9ec4c536853325268e871288a2d906a73e046438))
+* **lints:** resolve lint_groups_priority error in Cargo.toml ([ef2c8ac](https://github.com/rixlhq/snowid-rust/commit/ef2c8acd6c7765af4509f55b223c1404b901f65c))
+* **perf:inline:** replace inline(always) with inline on hot path only ([b6b71ec](https://github.com/rixlhq/snowid-rust/commit/b6b71ecb99d26ad7adfe3feccca7cbc3b3fe7d8d))
+
 ## [3.0.0](https://github.com/rixlhq/snowid-rust/compare/v2.1.0...v3.0.0) (2026-05-22)
 
 
