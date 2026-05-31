@@ -1,6 +1,6 @@
 cognitive-complexity-threshold = 10
 too-many-arguments-threshold = 4
-too-many-lines-threshold = 50
+too-many-lines-threshold = 40
 excessive-nesting-threshold = 4
 
 pass-by-value-size-limit = 256

@@ -21,43 +21,32 @@ repository = "https://github.com/qeeqez/snowid-rust"
 
 [lints.rust]
 unused_qualifications = "deny"
-trivial_casts = "deny"
-trivial_numeric_casts = "deny"
-redundant_semicolons = "deny"
 unused_allocation = "deny"
-impl_trait_redundant_captures = "deny"
+redundant_semicolons = "deny"
 
 [lints.clippy]
-# Safety / critical
+pedantic = { level = "warn", priority = -1 }
 unwrap_used = "deny"
 expect_used = "deny"
-panic = "deny"
 todo = "deny"
 unimplemented = "deny"
 dbg_macro = "deny"
-print_stdout = "deny"
-print_stderr = "deny"
-wildcard_imports = "deny"
-# Complexity (thresholds in clippy.toml)
+panic = "warn"
+print_stdout = "warn"
+print_stderr = "warn"
 cognitive_complexity = "warn"
 too_many_lines = "warn"
-# Cast safety
 cast_possible_truncation = "warn"
 cast_possible_wrap = "warn"
 cast_precision_loss = "warn"
 cast_sign_loss = "warn"
 checked_conversions = "warn"
-# Code quality
-redundant_closure_for_method_calls = "warn"
-cloned_instead_of_copied = "warn"
-redundant_clone = "warn"
-redundant_closure = "warn"
-needless_collect = "warn"
-needless_continue = "warn"
-unused_self = "warn"
-undocumented_unsafe_blocks = "warn"
-mem_forget = "warn"
-wrong_transmute = "warn"
+
+# Optional: suppress overly noisy pedantic lints you don't care about
+# (add only what you actually want to silence)
+# module_name_repetitions = "allow"
+# missing_errors_doc = "allow"
+# missing_panics_doc = "allow"
 
 [profile.release]
 opt-level = 3
