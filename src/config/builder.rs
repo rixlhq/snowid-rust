@@ -1,12 +1,12 @@
-//! SnowIDConfig builder for constructing configuration
+//! `SnowIDConfig` builder for constructing configuration
 
 use super::{SnowIDConfig, SnowIDConfigError};
 
 /// Default configuration values
 pub(super) const DEFAULT_NODE_BITS: u8 = 10;
-pub(super) const DEFAULT_CUSTOM_EPOCH: u64 = 1704067200000; // January 1, 2024 UTC
+pub(super) const DEFAULT_CUSTOM_EPOCH: u64 = 1_704_067_200_000; // January 1, 2024 UTC
 
-/// Builder for SnowIDConfig
+/// Builder for `SnowIDConfig`
 #[derive(Debug)]
 pub struct SnowIDConfigBuilder {
     pub(super) node_bits: u8,
@@ -14,7 +14,7 @@ pub struct SnowIDConfigBuilder {
 }
 
 impl SnowIDConfigBuilder {
-    /// Create a new SnowIDConfigBuilder with default values
+    /// Create a new `SnowIDConfigBuilder` with default values
     pub const fn new() -> Self {
         Self {
             node_bits: DEFAULT_NODE_BITS,
@@ -23,7 +23,7 @@ impl SnowIDConfigBuilder {
     }
 
     /// Set the number of bits for node ID (6-16)
-    /// Sequence bits will be automatically set to (22 - node_bits)
+    /// Sequence bits will be automatically set to (22 - `node_bits`)
     pub fn node_bits(mut self, bits: u8) -> Result<Self, SnowIDConfigError> {
         if !(6..=16).contains(&bits) {
             return Err(SnowIDConfigError::InvalidNodeBits { bits });
@@ -38,7 +38,7 @@ impl SnowIDConfigBuilder {
         self
     }
 
-    /// Build the final SnowIDConfig
+    /// Build the final `SnowIDConfig`
     pub fn build(self) -> SnowIDConfig {
         SnowIDConfig::new(self.node_bits, self.custom_epoch)
     }

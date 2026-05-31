@@ -1,4 +1,4 @@
-//! Configuration for SnowID generator
+//! Configuration for `SnowID` generator
 //!
 #![allow(clippy::cast_possible_truncation)]
 
@@ -23,7 +23,7 @@ impl fmt::Display for SnowIDConfigError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             Self::InvalidNodeBits { bits } => {
-                write!(f, "Node bits {} must be between 6 and 16", bits)
+                write!(f, "Node bits {bits} must be between 6 and 16")
             },
         }
     }
@@ -31,7 +31,7 @@ impl fmt::Display for SnowIDConfigError {
 
 impl Error for SnowIDConfigError {}
 
-/// Configuration for SnowID generator
+/// Configuration for `SnowID` generator
 /// Copy-optimized with const-evaluable fields
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
@@ -51,7 +51,7 @@ impl SnowIDConfig {
         ((1u32 << bits) - 1) as u16
     }
 
-    /// Create new SnowIDConfig with given node bits
+    /// Create new `SnowIDConfig` with given node bits
     const fn new(node_bits: u8, custom_epoch: u64) -> Self {
         let sequence_bits = SnowID::TOTAL_NODE_AND_SEQUENCE_BITS - node_bits;
         Self {
