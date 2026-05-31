@@ -14,31 +14,31 @@ impl State {
     pub const SEQ_MASK: u64 = (1 << Self::SEQ_BITS) - 1;
 
     /// Create new state from timestamp and sequence
-    #[inline(always)]
+    #[inline]
     pub const fn new(timestamp: u64, sequence: u16) -> Self {
         Self((timestamp << Self::SEQ_BITS) | (sequence as u64))
     }
 
     /// Extract timestamp from state
-    #[inline(always)]
+    #[inline]
     pub const fn timestamp(self) -> u64 {
         self.0 >> Self::SEQ_BITS
     }
 
     /// Extract sequence from state
-    #[inline(always)]
+    #[inline]
     pub const fn sequence(self) -> u16 {
         (self.0 & Self::SEQ_MASK) as u16
     }
 
     /// Get raw u64 value for atomic operations
-    #[inline(always)]
+    #[inline]
     pub const fn raw(self) -> u64 {
         self.0
     }
 
     /// Create state from raw u64 value
-    #[inline(always)]
+    #[inline]
     pub const fn from_raw(raw: u64) -> Self {
         Self(raw)
     }

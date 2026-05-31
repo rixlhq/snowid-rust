@@ -15,21 +15,18 @@ impl SnowIDExtractor {
     }
 
     /// Extract timestamp component from a `SnowID`
-    #[inline(always)]
     #[must_use]
     pub const fn timestamp(&self, id: u64) -> u64 {
         (id >> self.config.timestamp_shift()) & self.config.timestamp_mask()
     }
 
     /// Extract node component from a `SnowID`
-    #[inline(always)]
     #[must_use]
     pub fn node(&self, id: u64) -> u16 {
         ((id >> self.config.node_shift()) & u64::from(self.config.node_mask())) as u16
     }
 
     /// Extract sequence component from a `SnowID`
-    #[inline(always)]
     #[must_use]
     pub fn sequence(&self, id: u64) -> u16 {
         (id & u64::from(self.config.sequence_mask())) as u16

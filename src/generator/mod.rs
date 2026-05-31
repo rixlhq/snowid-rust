@@ -94,17 +94,17 @@ impl SnowID {
         }
     }
 
-    #[inline(always)]
+    #[inline]
     const fn compute_node_prefix(node_id: u16, config: &SnowIDConfig) -> u64 {
         (node_id as u64) << config.node_shift()
     }
 
-    #[inline(always)]
+    #[inline]
     pub(crate) fn now_ms(&self) -> u64 {
         time_since_epoch(self.epoch)
     }
 
-    #[inline(always)]
+    #[inline]
     pub(crate) const fn assemble_id(&self, timestamp: u64, sequence: u16) -> u64 {
         ((timestamp & self.ts_mask) << self.ts_shift) | self.node_prefix | (sequence as u64)
     }

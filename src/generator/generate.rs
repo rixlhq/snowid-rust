@@ -27,7 +27,7 @@ impl SnowID {
     /// When the current millisecond has no remaining sequence values, this method advances the
     /// generator's logical timestamp and returns immediately. The timestamp component can run
     /// ahead of wall-clock time under sustained overload.
-    #[inline(always)]
+    #[inline]
     pub fn generate(&self) -> u64 {
         loop {
             let now = self.now_ms();
@@ -112,7 +112,7 @@ impl SnowID {
     }
 
     /// Attempt a single generation: claim new ms or increment sequence.
-    #[inline(always)]
+    #[inline]
     fn try_generate_once(&self, now: u64, current: State) -> Option<u64> {
         let ts = current.timestamp();
         if now > ts {
@@ -129,7 +129,7 @@ impl SnowID {
         None
     }
 
-    #[inline(always)]
+    #[inline]
     fn try_generate_logical_once(&self, now: u64, current: State) -> Option<u64> {
         let ts = current.timestamp();
         let seq = current.sequence();
@@ -144,7 +144,7 @@ impl SnowID {
         self.cas_state(current, State::new(new_ts, new_seq)).then(|| self.assemble_id(new_ts, new_seq))
     }
 
-    #[inline(always)]
+    #[inline]
     fn try_reserve_batch(&self, now: u64, current: State, out: &mut [u64]) -> Option<usize> {
         let ts = current.timestamp();
         let start_seq = if now > ts {
@@ -209,7 +209,7 @@ impl SnowID {
     }
 
     /// Atomic compare-and-swap on state
-    #[inline(always)]
+    #[inline]
     pub(crate) fn cas_state(&self, expected: State, new: State) -> bool {
         self.state
             .compare_exchange_weak(expected.raw(), new.raw(), Ordering::AcqRel, Ordering::Acquire)

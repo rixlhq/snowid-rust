@@ -7,14 +7,14 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Get current wall-clock time in milliseconds since Unix epoch
-#[inline(always)]
+#[inline]
 #[must_use]
 pub fn unix_time_ms() -> u64 {
     SystemTime::now().duration_since(UNIX_EPOCH).expect("System time before Unix epoch").as_millis() as u64
 }
 
 /// Get current time in milliseconds since custom epoch
-#[inline(always)]
+#[inline]
 #[must_use]
 pub fn time_since_epoch(epoch: u64) -> u64 {
     unix_time_ms() - epoch
