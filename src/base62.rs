@@ -1,4 +1,4 @@
-//! Base62 encoding and decoding for SnowID values
+//! Base62 encoding and decoding for `SnowID` values
 //!
 //! Provides zero-allocation variants for hot paths:
 //! - `encode_array`: Returns [u8; 11] + length
@@ -15,6 +15,10 @@ pub const MAX_LEN: usize = 11;
 
 /// Zero-allocation base62 encoding to a fixed-size array
 /// Returns the array and the actual length of encoded bytes
+///
+/// # Panics
+///
+/// Panics if the base62 encoding fails, which should never happen with valid `u64` input.
 #[inline]
 #[must_use]
 pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
@@ -25,6 +29,11 @@ pub fn encode_array(id: u64) -> ([u8; MAX_LEN], usize) {
 
 /// Zero-allocation base62 encoding into caller-provided buffer
 /// Returns a str slice of the encoded portion
+///
+/// # Panics
+///
+/// Panics if base62 encoding fails or produces invalid UTF-8, which should never
+/// happen with valid `u64` input.
 #[inline]
 pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
     let len = base62::encode_bytes(id, buf).unwrap();
@@ -33,6 +42,11 @@ pub fn encode_into(id: u64, buf: &mut [u8; MAX_LEN]) -> &str {
 
 /// Base62 encode with String allocation (convenience wrapper)
 /// For hot paths, prefer `encode_array` or `encode_into`
+///
+/// # Panics
+///
+/// Panics if encoding fails or produces invalid UTF-8, which should never happen
+/// with valid `u64` input.
 #[inline]
 #[must_use]
 pub fn encode(id: u64) -> String {
@@ -41,6 +55,11 @@ pub fn encode(id: u64) -> String {
 }
 
 /// Decode a base62 string to a u64, handling potential overflow
+///
+/// # Errors
+///
+/// Returns [`DecodeError`] if the input contains invalid base62 characters or
+/// the decoded value overflows a `u64`.
 pub fn decode(encoded: &str) -> Result<u64, DecodeError> {
     let decoded = base62::decode(encoded).map_err(DecodeError::from)?;
 
@@ -67,7 +86,7 @@ impl fmt::Display for DecodeError {
         match *self {
             Self::InvalidCharacter => write!(f, "Invalid base62 character"),
             Self::Overflow => write!(f, "Decoded value would overflow u64"),
-            Self::Other(ref e) => write!(f, "Base62 decode error: {}", e),
+            Self::Other(ref e) => write!(f, "Base62 decode error: {e}"),
         }
     }
 }

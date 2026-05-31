@@ -2,40 +2,40 @@
 
 use crate::config::SnowIDConfig;
 
-/// SnowID component extractor
+/// `SnowID` component extractor
 #[derive(Debug, Copy, Clone)]
 pub struct SnowIDExtractor {
     config: SnowIDConfig,
 }
 
 impl SnowIDExtractor {
-    /// Create a new SnowID extractor with the given configuration
+    /// Create a new `SnowID` extractor with the given configuration
     pub(crate) const fn new(config: SnowIDConfig) -> Self {
         Self { config }
     }
 
-    /// Extract timestamp component from a SnowID
+    /// Extract timestamp component from a `SnowID`
     #[inline(always)]
     #[must_use]
     pub const fn timestamp(&self, id: u64) -> u64 {
         (id >> self.config.timestamp_shift()) & self.config.timestamp_mask()
     }
 
-    /// Extract node component from a SnowID
+    /// Extract node component from a `SnowID`
     #[inline(always)]
     #[must_use]
     pub fn node(&self, id: u64) -> u16 {
         ((id >> self.config.node_shift()) & u64::from(self.config.node_mask())) as u16
     }
 
-    /// Extract sequence component from a SnowID
+    /// Extract sequence component from a `SnowID`
     #[inline(always)]
     #[must_use]
     pub fn sequence(&self, id: u64) -> u16 {
         (id & u64::from(self.config.sequence_mask())) as u16
     }
 
-    /// Decompose SnowID into its components: timestamp, node ID, and sequence
+    /// Decompose `SnowID` into its components: timestamp, node ID, and sequence
     #[inline]
     #[must_use]
     pub fn decompose(&self, id: u64) -> (u64, u16, u16) {

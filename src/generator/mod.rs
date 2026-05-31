@@ -1,4 +1,4 @@
-//! Core SnowID generator implementation
+//! Core `SnowID` generator implementation
 //!
 //! Split into modules for testability:
 //! - `state` - Combined atomic state (timestamp + sequence)
@@ -44,11 +44,19 @@ impl SnowID {
     pub const MAX_TIMESTAMP: u64 = (1u64 << Self::TIMESTAMP_BITS) - 1;
 
     /// Create with default configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SnowIDError`] if the node ID is invalid or the epoch is out of range.
     pub fn new(node_id: u16) -> Result<Self, SnowIDError> {
         Self::with_config(node_id, SnowIDConfig::default())
     }
 
     /// Create with custom configuration
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SnowIDError`] if the node ID is invalid or the epoch is out of range.
     pub fn with_config(node_id: u16, config: SnowIDConfig) -> Result<Self, SnowIDError> {
         Self::validate_node_id(node_id, &config)?;
         Ok(Self::build(node_id, config))

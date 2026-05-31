@@ -1,4 +1,4 @@
-//! Time utilities for SnowID generation
+//! Time utilities for `SnowID` generation
 //!
 //! Provides wall-clock time in milliseconds since custom epoch
 //!

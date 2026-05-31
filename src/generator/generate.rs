@@ -1,12 +1,13 @@
 //! ID generation logic
 //!
-//! Core generate() implementation with fast and slow paths
+//! Core `generate()` implementation with fast and slow paths
 
 use std::sync::atomic::Ordering;
 
 use super::SnowID;
 use super::state::State;
 
+#[derive(Clone, Copy)]
 struct LogicalBatchStart {
     base_ts: u64,
     start: usize,
@@ -21,7 +22,7 @@ pub struct TryGenerateError {
 }
 
 impl SnowID {
-    /// Generate a new SnowID without waiting for wall-clock time on sequence exhaustion.
+    /// Generate a new `SnowID` without waiting for wall-clock time on sequence exhaustion.
     ///
     /// When the current millisecond has no remaining sequence values, this method advances the
     /// generator's logical timestamp and returns immediately. The timestamp component can run
@@ -37,10 +38,15 @@ impl SnowID {
         }
     }
 
-    /// Try to generate a new SnowID without waiting for the next millisecond.
+    /// Try to generate a new `SnowID` without waiting for the next millisecond.
     ///
     /// This returns an error instead of spinning or sleeping when the current
     /// millisecond has no remaining sequence values.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TryGenerateError`] when the current millisecond's sequence space
+    /// is exhausted.
     #[inline]
     pub fn try_generate(&self) -> Result<u64, TryGenerateError> {
         loop {
@@ -86,7 +92,7 @@ impl SnowID {
         }
     }
 
-    /// Fill `out` with SnowIDs without waiting for wall-clock time on sequence exhaustion.
+    /// Fill `out` with `SnowIDs` without waiting for wall-clock time on sequence exhaustion.
     ///
     /// This reserves a logical timestamp range with one atomic state update, then fills the full
     /// buffer. The timestamp component can run ahead of wall-clock time under sustained overload.

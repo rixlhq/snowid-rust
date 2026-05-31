@@ -1,4 +1,4 @@
-//! # SnowID
+//! # `SnowID`
 //!
 //! A Rust implementation of a Snowflake-like ID generator with 42-bit timestamp.
 //!

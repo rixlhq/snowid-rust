@@ -1,12 +1,12 @@
 use std::error::Error;
 use std::fmt;
 
-/// Represents errors that can occur during SnowID operations
+/// Represents errors that can occur during `SnowID` operations
 #[derive(Debug, Clone, PartialEq)]
 pub enum SnowIDError {
     /// Error when node ID exceeds the maximum allowed value
     InvalidNodeId { node_id: u16, max: u16 },
-    /// Error when epoch is outside the timestamp range representable by SnowID
+    /// Error when epoch is outside the timestamp range representable by `SnowID`
     InvalidEpoch { epoch: u64, now: u64, max_age_ms: u64 },
 }
 
