@@ -24,15 +24,17 @@ jobs:
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Check formatting
-        run: cargo fmt --all -- --check
+      - parallel:
+          - name: Check formatting
+            run: cargo fmt --all -- --check
 
-      - name: Clippy
-        run: cargo clippy -- -D warnings
+          - name: Clippy
+            run: cargo clippy -- -D warnings
 
-      - name: Build
-        run: cargo build --release
+          - name: Build
+            run: cargo build --release
 
-      - name: Run tests
-        run: cargo test --release
+          - name: Run tests
+            run: cargo test --release
+
 
