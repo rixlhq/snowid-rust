@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.0.2](https://github.com/rixlhq/snowid-rust/compare/v3.0.1...v3.0.2) (2026-09-15)
+
+
+### Build System
+
+* **deps:** bump base62 from 2.2.4 to 2.2.6 in the dependencies group ([09b0295](https://github.com/rixlhq/snowid-rust/commit/09b0295c5d4a392fd80c73f9b03d073d754c0695))
+
 ## [3.0.1](https://github.com/rixlhq/snowid-rust/compare/v3.0.0...v3.0.1) (2026-05-31)
 
 
