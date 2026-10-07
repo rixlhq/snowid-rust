@@ -9,6 +9,10 @@ on:
 env:
   CARGO_TERM_COLOR: always
   NEXTEST_COLOR: always
+  # Keep rustup state inside the mise data dir so the mise-action cache
+  # restores the full Rust toolchain (not just mise's install marker).
+  MISE_RUSTUP_HOME: /home/runner/.local/share/mise/rustup
+  MISE_CARGO_HOME: /home/runner/.local/share/mise/cargo
 
 jobs:
   build:
@@ -17,32 +21,27 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install mold linker
-        uses: rui314/setup-mold@v1
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          components: clippy, rustfmt
+      - name: Install tools with mise
+        uses: jdx/mise-action@v5
 
       - name: Rust Cache
         uses: Swatinem/rust-cache@v2
 
-      - name: Install cargo-nextest
-        uses: taiki-e/install-action@nextest
+      - name: Fetch locked dependencies
+        run: cargo fetch --locked
 
       - parallel:
           - name: Check formatting
             run: cargo fmt --all -- --check
 
           - name: Clippy
-            run: cargo clippy -- -D warnings
+            run: mise run lint:clippy
+
+          - name: SLOC guard
+            run: mise run lint:sloc
 
           - name: Build
             run: cargo build --release
 
           - name: Run tests
-            run: cargo nextest run --release
-
-
-
+            run: mise run test
