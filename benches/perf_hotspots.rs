@@ -38,10 +38,10 @@ fn join_checksum(handles: Vec<thread::JoinHandle<u64>>) -> u64 {
     checksum
 }
 
-fn shared_generator_batch(generator: Arc<SnowID>, thread_count: usize) -> u64 {
+fn shared_generator_batch(generator: &Arc<SnowID>, thread_count: usize) -> u64 {
     let mut handles = Vec::with_capacity(thread_count);
     for _ in 0..thread_count {
-        let generator = Arc::clone(&generator);
+        let generator = Arc::clone(generator);
         handles.push(thread::spawn(move || generate_batch(&generator, 1024)));
     }
     join_checksum(handles)
@@ -58,7 +58,7 @@ fn per_thread_generator_batch(thread_count: usize) -> u64 {
     join_checksum(handles)
 }
 
-pub fn time_source_cost(c: &mut Criterion) {
+fn time_source_cost(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Time Source");
 
     group.bench_function("system_time_unix_ms", |b| {
@@ -79,7 +79,7 @@ pub fn time_source_cost(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn generation_by_capacity(c: &mut Criterion) {
+fn generation_by_capacity(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Generate Capacity");
 
     for node_bits in [6, 10, 16] {
@@ -93,7 +93,7 @@ pub fn generation_by_capacity(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn generation_burst_capacity(c: &mut Criterion) {
+fn generation_burst_capacity(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Generate Burst Capacity");
 
     for node_bits in [6, 10, 16] {
@@ -107,7 +107,7 @@ pub fn generation_burst_capacity(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn logical_generation(c: &mut Criterion) {
+fn logical_generation(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Logical Generation");
 
     for node_bits in [10, 16] {
@@ -121,7 +121,7 @@ pub fn logical_generation(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn batch_reservation(c: &mut Criterion) {
+fn batch_reservation(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Batch Reservation");
 
     for batch in [64usize, 256, 1024] {
@@ -162,7 +162,7 @@ pub fn batch_reservation(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn generator_creation(c: &mut Criterion) {
+fn generator_creation(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Generator Creation");
 
     group.bench_function("default_new", |b| {
@@ -177,14 +177,14 @@ pub fn generator_creation(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn shared_generator_contention(c: &mut Criterion) {
+fn shared_generator_contention(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Shared Generator");
 
     for thread_count in [2usize, 4, 8] {
         group.bench_function(format!("threads/{thread_count}/ops_per_thread/1024"), |b| {
             b.iter_batched(
                 || Arc::new(SnowID::new(1).unwrap()),
-                |generator| black_box(shared_generator_batch(generator, thread_count)),
+                |generator| black_box(shared_generator_batch(&generator, thread_count)),
                 BatchSize::SmallInput,
             );
         });
@@ -193,7 +193,7 @@ pub fn shared_generator_contention(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn per_thread_generator(c: &mut Criterion) {
+fn per_thread_generator(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Per Thread Generator");
 
     for thread_count in [2usize, 4, 8] {
@@ -205,7 +205,7 @@ pub fn per_thread_generator(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn extraction_shapes(c: &mut Criterion) {
+fn extraction_shapes(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Extraction");
     let generator = SnowID::new(1).unwrap();
     let id = generator.generate();
@@ -236,7 +236,7 @@ pub fn extraction_shapes(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn base62_buffer_reuse(c: &mut Criterion) {
+fn base62_buffer_reuse(c: &mut Criterion) {
     let mut group = c.benchmark_group("Hotspot Base62 Boundary");
     let generator = SnowID::new(1).unwrap();
 

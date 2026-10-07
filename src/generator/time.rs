@@ -28,14 +28,14 @@ mod tests {
     fn test_unix_time_is_reasonable() {
         let now = unix_time_ms();
         // Should be after 2024-01-01
-        assert!(now > 1704067200000);
+        assert!(now > 1_704_067_200_000);
         // Should be before 2100-01-01
-        assert!(now < 4102444800000);
+        assert!(now < 4_102_444_800_000);
     }
 
     #[test]
     fn test_time_since_epoch() {
-        let epoch = 1704067200000u64; // 2024-01-01
+        let epoch = 1_704_067_200_000u64; // 2024-01-01
         let ts = time_since_epoch(epoch);
         // Should be positive (after 2024)
         assert!(ts > 0);

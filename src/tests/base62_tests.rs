@@ -5,7 +5,7 @@ mod tests {
     #[test]
     fn test_base62_encoding_decoding() {
         // Test basic encoding/decoding
-        let test_values = [0u64, 1, 62, 123, 1234567890, u64::MAX / 2, u64::MAX];
+        let test_values = [0u64, 1, 62, 123, 1_234_567_890, u64::MAX / 2, u64::MAX];
 
         for &value in &test_values {
             let encoded = base62::encode(value);

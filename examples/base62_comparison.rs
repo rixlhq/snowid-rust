@@ -74,5 +74,5 @@ fn main() {
 
 // Helper function to convert Duration to nanoseconds as f64
 fn duration_to_ns(duration: Duration) -> f64 {
-    duration.as_secs() as f64 * 1_000_000_000.0 + duration.subsec_nanos() as f64
+    duration.as_secs() as f64 * 1_000_000_000.0 + f64::from(duration.subsec_nanos())
 }

@@ -58,7 +58,7 @@ mod tests {
 
     #[test]
     fn test_epoch_handling() {
-        let custom_epoch = 1577836800000; // 2020-01-01 00:00:00 UTC
+        let custom_epoch = 1_577_836_800_000; // 2020-01-01 00:00:00 UTC
         let config = SnowIDConfig::builder().epoch(custom_epoch).build();
 
         let generator = SnowID::with_config(1, config).unwrap();

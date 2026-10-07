@@ -19,7 +19,7 @@ const TEST_VALUES: [u64; 5] = [
     u64::MAX,     // Maximum u64
 ];
 
-pub fn id_generation_comparison(c: &mut Criterion) {
+fn id_generation_comparison(c: &mut Criterion) {
     let mut group = c.benchmark_group("ID Generation Comparison");
 
     // Create generator once
@@ -52,7 +52,7 @@ pub fn id_generation_comparison(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn base62_encoding(c: &mut Criterion) {
+fn base62_encoding(c: &mut Criterion) {
     let mut group = c.benchmark_group("Base62 Encoding");
 
     for &value in &TEST_VALUES {
@@ -70,7 +70,7 @@ pub fn base62_encoding(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn base62_decoding(c: &mut Criterion) {
+fn base62_decoding(c: &mut Criterion) {
     let mut group = c.benchmark_group("Base62 Decoding");
 
     for &value in &TEST_VALUES {
@@ -85,7 +85,7 @@ pub fn base62_decoding(c: &mut Criterion) {
     group.finish();
 }
 
-pub fn roundtrip_benchmark(c: &mut Criterion) {
+fn roundtrip_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Base62 Roundtrip");
 
     for &value in &TEST_VALUES {

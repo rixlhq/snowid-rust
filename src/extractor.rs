@@ -53,7 +53,7 @@ mod tests {
         let config = SnowIDConfig::default();
         let extractor = SnowIDExtractor::new(config);
 
-        let timestamp: u64 = 0x1234567;
+        let timestamp: u64 = 0x0123_4567;
         let node: u16 = 42;
         let sequence: u16 = 123;
 

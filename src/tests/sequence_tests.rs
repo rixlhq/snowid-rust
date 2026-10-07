@@ -39,7 +39,7 @@ mod tests {
         let generator = SnowID::new(1).unwrap();
         let mut last_ts = 0;
 
-        for _ in 0..100000 {
+        for _ in 0..100_000 {
             let id = generator.generate();
             let (ts, _, seq) = generator.extract.decompose(id);
 
@@ -156,7 +156,7 @@ mod tests {
     fn test_generate_batch_handles_sustained_logical_overflow() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
-        let mut ids = [0u64; 4096];
+        let mut ids = vec![0u64; 4096];
 
         generator.generate_batch(&mut ids);
 
@@ -172,7 +172,7 @@ mod tests {
     fn test_logical_future_state_never_moves_backwards() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
-        let mut ids = [0u64; 4096];
+        let mut ids = vec![0u64; 4096];
         generator.generate_batch(&mut ids);
 
         let next = generator.generate();
@@ -197,7 +197,7 @@ mod tests {
     fn test_try_generate_batch_returns_zero_when_logical_state_is_future() {
         let config = SnowIDConfig::builder().node_bits(16).unwrap().build();
         let generator = SnowID::with_config(1, config).unwrap();
-        let mut ids = [0u64; 4096];
+        let mut ids = vec![0u64; 4096];
         let mut out = [0u64; 4];
         generator.generate_batch(&mut ids);
 

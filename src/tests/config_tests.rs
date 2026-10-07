@@ -28,11 +28,11 @@ mod tests {
 
     #[test]
     fn test_custom_config() {
-        let config = SnowIDConfig::builder().node_bits(12).unwrap().epoch(1640995200000).build();
+        let config = SnowIDConfig::builder().node_bits(12).unwrap().epoch(1_640_995_200_000).build();
 
         assert_eq!(config.node_bits(), 12);
         assert_eq!(config.sequence_bits(), 10);
-        assert_eq!(config.epoch(), 1640995200000);
+        assert_eq!(config.epoch(), 1_640_995_200_000);
     }
 
     #[test]

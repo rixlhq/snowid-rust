@@ -50,7 +50,7 @@ mod tests {
 
     #[test]
     fn test_state_roundtrip() {
-        let ts = 123456789u64;
+        let ts = 123_456_789u64;
         let seq = 4095u16;
         let state = State::new(ts, seq);
 

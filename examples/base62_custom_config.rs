@@ -13,7 +13,7 @@ use snowid::{SnowID, SnowIDConfig};
 fn main() {
     // Create a custom configuration for many nodes (16 bits = 65,536 nodes)
     let config = SnowIDConfig::builder()
-        .epoch(1577836800000) // 2020-01-01 00:00:00 UTC
+        .epoch(1_577_836_800_000) // 2020-01-01 00:00:00 UTC
         .node_bits(16) // 16 bits for node ID = 65536 nodes
         .unwrap()
         .build();
