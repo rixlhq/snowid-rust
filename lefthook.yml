@@ -10,12 +10,12 @@ pre-commit:
       stage_fixed: true
 
     - name: lint
-      glob: &rust ["**/*.rs", "/*.toml", "Cargo.lock"]
-      run: mise run lint:clippy {staged_files}
+      glob: &rust ["**/*.rs", "*.toml", "Cargo.lock"]
+      run: mise run lint:clippy
 
     - name: sloc
       glob: *rust
-      run: mise run lint:sloc
+      run: mise run lint:sloc-staged
 
 pre-push:
   jobs:
