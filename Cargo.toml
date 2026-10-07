@@ -49,11 +49,11 @@ opt-level = 0
 debug = true
 
 [dependencies]
-base62 = "2.2.4"
+base62 = "2.2.6"
 
 [dev-dependencies]
 criterion = { version = "0.8.2", features = ["html_reports"] }
-rand = "0.10.2"
+rand = "0.10.3"
 chrono = "0.4.45"
 proptest = "1.11.0"
 
