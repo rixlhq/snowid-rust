@@ -1,5 +1,6 @@
 **/target/
 **/debug/
+.sloc-guard/
 .DS_Store
 .idea
 *.iml
