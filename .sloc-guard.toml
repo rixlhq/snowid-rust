@@ -1,0 +1,16 @@
+# https://github.com/doraemonkeys/sloc-guard
+version = "2"
+
+[scanner]
+gitignore = true
+exclude = [".git/**", "target/**", "data/**", "vendor/**"]
+
+[content]
+extensions = ["rs"]
+max_lines = 250
+warn_threshold = 1.0
+skip_comments = true
+skip_blank = true
+
+[check]
+warnings_as_errors = true
