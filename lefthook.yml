@@ -1,0 +1,24 @@
+glob_matcher: doublestar
+
+pre-commit:
+  parallel: true
+
+  jobs:
+    - name: fmt
+      glob: "**/*.rs"
+      run: mise run fmt:files {staged_files}
+      stage_fixed: true
+
+    - name: lint
+      glob: &rust ["**/*.rs", "/*.toml", "Cargo.lock"]
+      run: mise run lint:clippy {staged_files}
+
+    - name: sloc
+      glob: *rust
+      run: mise run lint:sloc
+
+pre-push:
+  jobs:
+    - name: test
+      glob: *rust
+      run: mise run test
