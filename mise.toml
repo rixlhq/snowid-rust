@@ -1,0 +1,37 @@
+[tools]
+rust = { version = "1.99", components = ["clippy", "rustfmt"] }
+mold = { version = "latest", os = ["linux"] }
+"cargo:sloc-guard" = "0.6"
+"cargo:cargo-nextest" = "0.9"
+lefthook = "2.1"
+
+[env]
+CARGO_TERM_COLOR = "always"
+
+[hooks]
+postinstall = { task = "setup" }
+
+[tasks.setup]
+description = "Initial project setup (install git hooks)"
+run = "lefthook install"
+
+[tasks.fmt]
+description = "Format the whole project"
+run = "cargo fmt --all"
+
+[tasks."fmt:files"]
+description = "Format specified Rust files"
+raw_args = true
+run = "rustfmt"
+
+[tasks."lint:clippy"]
+description = "Lint the project with Clippy"
+run = "cargo clippy --locked --offline --all-targets -- -D warnings"
+
+[tasks."lint:sloc"]
+description = "Enforce max 250 SLOC per file (comments and blanks excluded)"
+run = "sloc-guard check"
+
+[tasks.test]
+description = "Run tests with nextest"
+run = "cargo nextest run --locked --all-targets"
