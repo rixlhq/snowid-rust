@@ -1,28 +1,46 @@
-//! Shared test utilities for SnowID tests
+//! Shared test utilities for `SnowID` tests
 
 use std::collections::HashSet;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 /// Get current wall-clock time in ms since custom epoch
+///
+/// # Panics
+///
+/// Panics if the system clock is before the Unix epoch or the
+/// millisecond timestamp does not fit in a `u64`.
+#[must_use]
 pub fn wall_clock_ms(epoch: u64) -> u64 {
     let now = SystemTime::now().duration_since(UNIX_EPOCH).expect("System time before Unix epoch!");
     u64::try_from(now.as_millis()).unwrap() - epoch
 }
 
 /// Assert that all IDs in the collection are unique
+///
+/// # Panics
+///
+/// Panics if the number of unique IDs differs from `expected_count`.
 pub fn assert_unique_ids(ids: &[u64], expected_count: usize) {
     let set: HashSet<_> = ids.iter().copied().collect();
-    assert_eq!(set.len(), expected_count, "Expected {} unique IDs, but got {} (duplicates detected)", expected_count, set.len());
+    assert_eq!(set.len(), expected_count, "Expected {expected_count} unique IDs, but got {} (duplicates detected)", set.len());
 }
 
 /// Assert that IDs are strictly monotonically increasing (in order)
+///
+/// # Panics
+///
+/// Panics if any ID is not greater than its predecessor.
 pub fn assert_ids_monotonic(ids: &[u64]) {
     for i in 1..ids.len() {
-        assert!(ids[i] > ids[i - 1], "ID at position {} ({}) should be > previous ({})", i, ids[i], ids[i - 1]);
+        assert!(ids[i] > ids[i - 1], "ID at position {i} ({}) should be > previous ({})", ids[i], ids[i - 1]);
     }
 }
 
 /// Assert that IDs are monotonically increasing when sorted
+///
+/// # Panics
+///
+/// Panics if any sorted ID is not greater than its predecessor.
 pub fn assert_monotonic_sorted(ids: &mut [u64]) {
     ids.sort_unstable();
     for i in 1..ids.len() {
@@ -37,6 +55,10 @@ pub fn assert_unique_and_monotonic(mut ids: Vec<u64>, expected_count: usize) {
 }
 
 /// Assert timestamp is accurate within tolerance (ms)
+///
+/// # Panics
+///
+/// Panics if the timestamp drifts from the wall clock by more than `tolerance_ms`.
 pub fn assert_timestamp_accurate(ts: u64, epoch: u64, tolerance_ms: u64) {
     let wall_ts = wall_clock_ms(epoch);
     let diff = wall_ts.abs_diff(ts);

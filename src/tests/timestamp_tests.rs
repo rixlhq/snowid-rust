@@ -101,7 +101,7 @@ mod tests {
 
     #[test]
     fn test_custom_epoch_timestamp() {
-        let epoch = 1577836800000u64;
+        let epoch = 1_577_836_800_000u64;
         let cfg = SnowIDConfig::builder().epoch(epoch).build();
         let g = SnowID::with_config(1, cfg).unwrap();
         assert_timestamp_accurate(g.extract.timestamp(g.generate()), epoch, 10);

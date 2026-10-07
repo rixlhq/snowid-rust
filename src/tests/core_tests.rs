@@ -20,7 +20,7 @@ mod tests {
         if ts1 == ts2 {
             assert!(seq2 > seq1, "Sequence should increment when timestamp is same");
         } else {
-            assert!(ts2 >= ts1, "Timestamp should not go backwards: ts1={}, ts2={}", ts1, ts2);
+            assert!(ts2 >= ts1, "Timestamp should not go backwards: ts1={ts1}, ts2={ts2}");
         }
     }
 }

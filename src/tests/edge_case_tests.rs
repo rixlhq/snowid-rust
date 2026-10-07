@@ -44,19 +44,19 @@ mod tests {
     #[test]
     fn test_id_bit_structure() {
         let cfg = SnowIDConfig::builder().node_bits(10).unwrap().epoch(0).build();
-        let g = SnowID::with_config(0b1010101010, cfg).unwrap();
+        let g = SnowID::with_config(0b10_1010_1010, cfg).unwrap();
 
         let id = g.generate();
         let node = g.extract.node(id);
-        assert_eq!(node, 0b1010101010, "Node bits should be preserved");
+        assert_eq!(node, 0b10_1010_1010, "Node bits should be preserved");
 
         // Verify bit positions: seq=12 bits, node=10 bits, ts=42 bits
         let seq_mask = 0xFFF; // 12 bits
         let node_mask = 0x3FF << 12; // 10 bits shifted by 12
         let ts_mask = !0u64 << 22; // remaining 42 bits
 
-        assert_eq!(id & seq_mask, g.extract.sequence(id) as u64);
-        assert_eq!((id & node_mask) >> 12, g.extract.node(id) as u64);
+        assert_eq!(id & seq_mask, u64::from(g.extract.sequence(id)));
+        assert_eq!((id & node_mask) >> 12, u64::from(g.extract.node(id)));
         assert_eq!((id & ts_mask) >> 22, g.extract.timestamp(id));
     }
 
@@ -69,7 +69,7 @@ mod tests {
             let g = SnowID::new(node).unwrap();
             for _ in 0..100 {
                 let id = g.generate();
-                assert!(all_ids.insert(id), "Collision from node {}", node);
+                assert!(all_ids.insert(id), "Collision from node {node}");
             }
         }
         assert_eq!(all_ids.len(), 1000);
@@ -82,7 +82,7 @@ mod tests {
         let ids: Vec<u64> = (0..100).map(|_| g.generate()).collect();
 
         let mut sorted = ids.clone();
-        sorted.sort();
+        sorted.sort_unstable();
 
         assert_eq!(ids, sorted, "IDs should already be numerically sorted");
     }
@@ -138,7 +138,7 @@ mod tests {
     /// Test epoch near current time (minimal timestamp values)
     #[test]
     fn test_recent_epoch() {
-        let recent_epoch = 1735689600000u64; // 2025-01-01
+        let recent_epoch = 1_735_689_600_000u64; // 2025-01-01
         let cfg = SnowIDConfig::builder().epoch(recent_epoch).build();
         let g = SnowID::with_config(1, cfg).unwrap();
 
@@ -146,10 +146,10 @@ mod tests {
         let ts = g.extract.timestamp(id);
 
         // Timestamp should be reasonable (within ~2 years of epoch)
-        assert!(ts < 2 * 365 * 24 * 60 * 60 * 1000, "Expected ts < 2 years, got {}", ts);
+        assert!(ts < 2 * 365 * 24 * 60 * 60 * 1000, "Expected ts < 2 years, got {ts}");
     }
 
-    /// Test all supported node_bits configurations
+    /// Test all supported `node_bits` configurations
     #[test]
     fn test_all_node_bits_configs() {
         for bits in 6..=16 {
@@ -159,8 +159,8 @@ mod tests {
 
             // Verify bit allocation
             assert_eq!(bits + cfg.sequence_bits(), 22);
-            assert_eq!(max_node as u32, (1u32 << bits) - 1);
-            assert_eq!(max_seq as u32, (1u32 << (22 - bits)) - 1);
+            assert_eq!(u32::from(max_node), (1u32 << bits) - 1);
+            assert_eq!(u32::from(max_seq), (1u32 << (22 - bits)) - 1);
 
             // Create generator at max node
             let g = SnowID::with_config(max_node, cfg).unwrap();
@@ -200,7 +200,7 @@ mod tests {
             let (ts, node, seq) = g.extract.decompose(id);
 
             // Reconstruct ID manually
-            let reconstructed = (ts << 22) | ((node as u64) << 12) | (seq as u64);
+            let reconstructed = (ts << 22) | (u64::from(node) << 12) | u64::from(seq);
             assert_eq!(id, reconstructed, "ID should round-trip through decomposition");
         }
     }

@@ -12,8 +12,8 @@ CARGO_TERM_COLOR = "always"
 postinstall = { task = "setup" }
 
 [tasks.setup]
-description = "Initial project setup (install git hooks)"
-run = "lefthook install"
+description = "Initial project setup (install git hooks, fetch locked deps)"
+run = ["lefthook install", "cargo fetch --locked"]
 
 [tasks.fmt]
 description = "Format the whole project"
@@ -22,7 +22,7 @@ run = "cargo fmt --all"
 [tasks."fmt:files"]
 description = "Format specified Rust files"
 raw_args = true
-run = "rustfmt"
+run = "rustfmt --edition 2024"
 
 [tasks."lint:clippy"]
 description = "Lint the project with Clippy"
@@ -31,6 +31,10 @@ run = "cargo clippy --locked --offline --all-targets -- -D warnings"
 [tasks."lint:sloc"]
 description = "Enforce max 250 SLOC per file (comments and blanks excluded)"
 run = "sloc-guard check"
+
+[tasks."lint:sloc-staged"]
+description = "Enforce SLOC limit on staged files only (pre-commit)"
+run = "sloc-guard check --staged"
 
 [tasks.test]
 description = "Run tests with nextest"

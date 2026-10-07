@@ -122,7 +122,7 @@ mod tests {
 
     #[test]
     fn test_encode_array_matches_string() {
-        let id = 12345678901234u64;
+        let id = 12_345_678_901_234u64;
         let string_encoded = encode(id);
         let (arr, len) = encode_array(id);
         let array_str = std::str::from_utf8(&arr[..len]).unwrap();
@@ -131,7 +131,7 @@ mod tests {
 
     #[test]
     fn test_encode_into_matches_string() {
-        let id = 98765432109876u64;
+        let id = 98_765_432_109_876u64;
         let string_encoded = encode(id);
         let mut buf = [0u8; MAX_LEN];
         let into_str = encode_into(id, &mut buf);
