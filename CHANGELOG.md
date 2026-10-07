@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.0.3](https://github.com/rixlhq/snowid-rust/compare/v3.0.2...v3.0.3) (2026-10-07)
+
+
+### Bug Fixes
+
+* **clippy:** satisfy pedantic lints for all targets on rust 1.99 ([a398adf](https://github.com/rixlhq/snowid-rust/commit/a398adfde99fa477f5d0ad49a6a7bf3cdfc4d56b))
+* **lefthook:** root toml glob, no args to clippy, staged sloc check ([82a1f48](https://github.com/rixlhq/snowid-rust/commit/82a1f481408a1fd3234c30ed82c0728f5e9acecd))
+* **mise:** edition-aware fmt, fetch deps in setup, staged sloc task ([651865f](https://github.com/rixlhq/snowid-rust/commit/651865f8cd03bde32aa6140964de2d7ba16c25a1))
+* review findings, mise-provisioned CI, all-targets clippy clean ([0e5d6c2](https://github.com/rixlhq/snowid-rust/commit/0e5d6c24c37c457dae2bf65a1b61e049d86cac9c))
+
 ## [3.0.2](https://github.com/rixlhq/snowid-rust/compare/v3.0.1...v3.0.2) (2026-09-15)
 
 
