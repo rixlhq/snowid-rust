@@ -1,4 +1,5 @@
 [tools]
+jactionlint = "2.0.2"
 rust = { version = "1.99", components = ["clippy", "rustfmt"] }
 mold = { version = "latest", os = ["linux"] }
 "cargo:sloc-guard" = "0.6"
