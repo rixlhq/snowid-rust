@@ -16,7 +16,12 @@ pre-commit:
     - name: sloc
       glob: *rust
       run: mise run lint:sloc-staged
-
+    - name: jactionlint
+      glob:
+        - ".github/workflows/*.{yml,yaml}"
+        - ".github/actions/**/action.{yml,yaml}"
+        - ".github/dependabot.{yml,yaml}"
+      run: mise exec -- jactionlint --profile correctness --shellcheck= {staged_files}
 pre-push:
   jobs:
     - name: test
