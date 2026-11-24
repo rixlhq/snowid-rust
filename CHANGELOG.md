@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.0.4](https://github.com/rixlhq/snowid-rust/compare/v3.0.3...v3.0.4) (2026-11-24)
+
+
+### Bug Fixes
+
+* **branding:** canonical company name, domain and address ([0528157](https://github.com/rixlhq/snowid-rust/commit/052815747056cd6bb6857c11f339c5d70885f9ea))
+* **branding:** use canonical company name Rixl Inc., rixl.com and Wilmington DE address ([0520d9e](https://github.com/rixlhq/snowid-rust/commit/0520d9e591513b281c6e331ab5dc08bda27d6421))
+
 ## [3.0.3](https://github.com/rixlhq/snowid-rust/compare/v3.0.2...v3.0.3) (2026-10-07)
 
 
